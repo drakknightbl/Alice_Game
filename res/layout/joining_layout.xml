@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="fill_parent"
+  android:layout_height="fill_parent">
+  
+<ImageView android:id="@+id/join_game_msg" 
+		   android:src="@drawable/join_game_msg" 
+		   android:layout_height="wrap_content" 
+		   android:layout_width="fill_parent"></ImageView>
+		   
+<TableLayout  xmlns:android="http://schemas.android.com/apk/res/android"
+			  android:id="@+id/TableLayout" 
+			  android:layout_width="fill_parent" 
+			  android:layout_height="fill_parent">
+<TableRow>
+	<TextView android:text="Test"/>
+</TableRow>
+
+<TableRow>
+	<TextView android:text="Test2"/>
+</TableRow>
+
+
+</TableLayout>
+
+</LinearLayout>

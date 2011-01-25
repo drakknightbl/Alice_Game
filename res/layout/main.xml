@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="wrap_content"
+  android:layout_height="wrap_content">
+
+<ImageView	android:id="@+id/image0"
+			android:src="@drawable/cartoon0"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"/>
+
+<ImageView	android:id="@+id/image1"
+			android:src="@drawable/cartoon1"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"/>
+
+<ImageView	android:id="@+id/image2"
+			android:src="@drawable/cartoon2"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"/>
+			
+<ImageButton	android:id="@+id/play_again_img"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:src="@drawable/play_again"
+				android:layout_centerInParent="true"
+				android:visibility="invisible"/>
+
+<ImageButton	android:id="@+id/try_again_img"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:src="@drawable/try_again"
+				android:layout_centerInParent="true"
+				android:visibility="invisible"/>
+
+
+<Button	android:id="@+id/sound_optn"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_alignParentLeft="true"/>
+
+<TextView android:id="@+id/score_text"
+		  android:layout_width="wrap_content" 
+		  android:layout_height="wrap_content" 
+		  android:text="Score:0" 
+		  android:layout_alignParentRight="true"></TextView>
+
+
+
+<ImageView	android:id="@+id/bottom_grass"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:src="@drawable/grass200"
+			android:layout_alignParentBottom="true"/>
+			
+
+<RelativeLayout android:layout_height="wrap_content" 
+				android:id="@+id/screen_dialer_relativeLayout_bottom" 
+				android:layout_alignParentBottom="true"
+				android:layout_width="fill_parent" 
+				android:gravity="bottom"
+				android:layout_below="@+id/screen_dialer_linearLayout_top" 
+				android:layout_margin="10px">
+				
+
+
+
+
+<ImageButton android:layout_height="wrap_content" 
+			 android:layout_width="wrap_content" 
+			 android:id="@+id/button0" 
+			 android:src="@drawable/cartoon0">
+			 
+			 </ImageButton>
+<ImageButton android:layout_toRightOf="@+id/button0" 
+			 android:layout_height="wrap_content" 
+			 android:layout_width="wrap_content" 
+			 android:id="@+id/button1" 
+			 android:src="@drawable/cartoon1">
+</ImageButton>
+<ImageButton android:layout_width="wrap_content" 
+			 android:layout_height="wrap_content" 
+			 android:layout_toRightOf="@+id/button1" 
+			 android:id="@+id/button2" 
+			 android:src="@drawable/cartoon2">
+</ImageButton>
+<!-- 
+ <ImageButton android:layout_height="wrap_content" 
+			 android:layout_width="wrap_content" 
+			 android:id="@+id/button3" 
+			 android:src="@drawable/cartoon3" 
+			 android:layout_toRightOf="@+id/button2"></ImageButton>
+ -->
+
+</RelativeLayout>
+
+
+
+		  
+</RelativeLayout>

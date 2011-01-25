@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello">Hello World, Main!</string>
+    <string name="app_name">AliceGame</string>
+    <string name="image_position_tag">0</string>
+</resources>
