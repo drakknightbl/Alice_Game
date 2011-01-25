@@ -1,17 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<set xmlns:android="http://schemas.android.com/apk/res/android">
-	 <translate android:fromXDelta="256" 
+<set xmlns:android="http://schemas.android.com/apk/res/android" >
+    
+	<translate  android:fromXDelta="128" 
     		 	android:toXDelta="0" 
+    		 	android:fromYDelta="240"
+    		 	android:toYDelta="120"
+    		 	android:duration="1000" /> 	
+    		 	
+ 
+    <translate  android:startOffset="1000"
+    			android:fromXDelta="0%p" 
+    		 	android:toXDelta="256" 
+    		 	android:fromYDelta="0"
+    		 	android:toYDelta="-40"
+    		 	android:duration="1000" />
+     		 	
+    <translate  android:startOffset="2000"
+    			android:fromXDelta="0"
+    		 	android:toXDelta="-256" 
+    		 	android:fromYDelta="40"
+    		 	android:toYDelta="20"
+    		 	android:duration="1000" />
+    
+    <translate  android:startOffset="3000"
+    			android:fromXDelta="0"
+    		 	android:toXDelta="100%p" 
+    		 	android:fromYDelta="0"
+    		 	android:toYDelta="-20%p"
+    		 	android:duration="1000" />
+   
+ <!--   
+    <translate  android:fromXDelta="100%p" 
+    		 	android:toXDelta="0" 
+    		 	android:fromYDelta="0"
+    		 	android:toYDelta="20"
+    		 	android:duration="1000" /> 	
+    		 	
+ 
+    <translate  android:startOffset="1000"
+    			android:fromXDelta="0%p" 
+    		 	android:toXDelta="256" 
+    		 	android:fromYDelta="20"
+    		 	android:toYDelta="40"
+    		 	android:duration="1000" />
+    		 	
+    <translate  android:startOffset="2000"
+    			android:fromXDelta="0"
+    		 	android:toXDelta="-256" 
     		 	android:fromYDelta="40"
     		 	android:toYDelta="80"
-    		 	android:duration="3000" /> 	
-    		 	
-    		 	
+    		 	android:duration="1000" />
+     
     <translate  android:startOffset="3000"
-    			android:fromXDelta="0" 
-    		 	android:toXDelta="256" 
-    		 	android:fromYDelta="80"
-    		 	android:toYDelta="160"
-    		 	android:duration="3000" />
-     	
+    			android:fromXDelta="0"
+    		 	android:toXDelta="128" 
+    		 	android:fromYDelta="0"
+    		 	android:toYDelta="120"
+    		 	android:duration="1000" />
+   --> 
+    		 	 
 </set>

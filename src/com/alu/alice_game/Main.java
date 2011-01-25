@@ -27,6 +27,8 @@ public class Main extends Activity {
 	private ArrayList<Integer> random_image_array = new ArrayList<Integer>();
 	private ArrayList<Integer> print_image_array = new ArrayList<Integer>();
 	
+	private boolean isSender; // true is sender false is receiver, ie. sender sets the order
+	
 	private int score;
 	
 	private TextView myScore;
@@ -66,7 +68,7 @@ public class Main extends Activity {
 		//ArrayList<Integer> image_array_copy = random_image_array;
 		ImageView image = (ImageView) findViewById(print_image_array.get(0));
 		print_image_array.remove(0);
-		Animation move = AnimationUtils.loadAnimation(Main.this, R.anim.z_move);
+		Animation move = AnimationUtils.loadAnimation(Main.this, R.anim.z_move_1);
 		move.setAnimationListener(new AnimListener());
 		image.startAnimation(move);
 		
@@ -207,6 +209,7 @@ public class Main extends Activity {
 		@Override
 		public void onClick(View v) {
 			Integer image_position_pressed = (Integer) v.getTag(R.string.image_position_tag);
+			// Below is Code for player to follow sequence
 			Integer image_position_current = random_image_array.get(0);
 			if(image_position_pressed.equals(image_position_current)) {
 				//disable button

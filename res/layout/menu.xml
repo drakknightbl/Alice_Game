@@ -10,7 +10,7 @@
 <ImageView android:id="@+id/menu_title" 
 		   android:layout_width="wrap_content" 
 		   android:layout_height="wrap_content"
-		   android:src="@drawable/Alice_game_title"
+		   android:src="@drawable/alice_game_title"
 		   android:layout_gravity="center_horizontal"></ImageView>
 		   
 		   
