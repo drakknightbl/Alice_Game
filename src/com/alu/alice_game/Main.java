@@ -3,20 +3,23 @@ package com.alu.alice_game;
 import java.util.ArrayList;
 import java.util.Random;
 
+import com.alu.alice_game.server.MultiPlayerAwsSupportImpl;
+import com.alu.alice_game.server.MultiPlayerStubSupportImpl;
+import com.alu.alice_game.server.MultiPlayerSupport;
+
 import android.app.Activity;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.animation.Animation;
-import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.media.MediaPlayer;
 
 public class Main extends Activity {
 	
@@ -49,8 +52,16 @@ public class Main extends Activity {
 	
 	private MediaPlayer background_music;
 	
+	private MultiPlayerSupport multiPlayerSupport;
+	
+	public Main() {
+		multiPlayerSupport = new MultiPlayerStubSupportImpl();
+		// multiPlayerSupport = new MultiPlayerAwsSupportImpl();
+	}
+	
     /** Called when the activity is first created. */
 	private int numOfRounds = 3;
+
 	private ArrayList<Integer> genOrder(){
 		ArrayList<Integer> random_image_array = new ArrayList<Integer>();
 		Random r = new Random();
