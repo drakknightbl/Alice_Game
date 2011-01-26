@@ -10,12 +10,12 @@
 <ImageView android:id="@+id/menu_title" 
 		   android:layout_width="wrap_content" 
 		   android:layout_height="wrap_content"
-		   android:src="@drawable/alice_game_title"
+		   android:src="@drawable/alicegametitle"
 		   android:layout_gravity="center_horizontal"></ImageView>
 		   
 		   
 <Button android:layout_height="wrap_content" 
-			 android:background="@drawable/create_game_btn" 
+			 android:background="@drawable/creategamebtn" 
 			 android:id="@+id/create_game_btn" 
 			 android:layout_width="wrap_content"
 			 android:layout_gravity="center_horizontal"></Button>
@@ -24,7 +24,7 @@
 <Button	android:id="@+id/join_game_btn"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:background="@drawable/join_game_btn"
+		android:background="@drawable/joingamebtn"
 		android:layout_gravity="center_horizontal"/>
 		   
 

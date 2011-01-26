@@ -1,15 +1,20 @@
 package com.alu.alice_game;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Random;
 
 import com.alu.alice_game.server.MultiPlayerAwsSupportImpl;
 import com.alu.alice_game.server.MultiPlayerStubSupportImpl;
 import com.alu.alice_game.server.MultiPlayerSupport;
+import com.alu.alice_game.domain.Player;
+
 
 import android.app.Activity;
+import android.content.Context;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -21,6 +26,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
 public class Main extends Activity {
 	
 	//private static int IMAGE_POSITION_TAG = 0;
@@ -31,11 +37,15 @@ public class Main extends Activity {
 	private ArrayList<Integer> print_image_array = new ArrayList<Integer>();
 	private ArrayList<Integer> send_image_array = new ArrayList<Integer>();
 	
-	private boolean isSender = true; // true is sender false is receiver, ie. sender sets the order
+	// sender sets the order
+	private boolean isSender = true; 
 	
-	private int score;
+	//receiver tries to playback the order
+	private boolean isReceiver = true;
 	
-	private TextView myScore;
+	private Handler mHandler = new Handler();
+	
+	
 	private Button sound_optn;
 	private ImageButton button0;
 	private ImageButton button1;
@@ -53,11 +63,35 @@ public class Main extends Activity {
 	private MediaPlayer background_music;
 	
 	private MultiPlayerSupport multiPlayerSupport;
+	private Collection<Player> inGamePlayers;
+	private Player player1;
+	private Player player2;
+	private Player sendPlayer;
+	private Player receivePlayer;
 	
 	public Main() {
 		multiPlayerSupport = new MultiPlayerStubSupportImpl();
 		// multiPlayerSupport = new MultiPlayerAwsSupportImpl();
 	}
+	
+	// Used to make a timer
+	private class DummyRunnable implements Runnable{
+		Context cxt;
+		public DummyRunnable(Context cxt){
+			this.cxt = 	cxt; 
+		}
+		@Override
+		public void run() {
+			Main m = (Main) cxt;
+		}
+		
+	}
+	
+	private Runnable TimeDelay = new DummyRunnable(this) {
+		public void run(){
+			
+		}
+	};
 	
     /** Called when the activity is first created. */
 	private int numOfRounds = 3;
@@ -92,8 +126,11 @@ public class Main extends Activity {
 			if(send_image_array.size() > 0){
 				Main.this.startSendAnimation();
 			}else {
-					isSender = false;
-					Main.this.retrieve_image_array();
+				Toast greeting_instructions = Toast.makeText(getApplicationContext(), "Set the Order", Toast.LENGTH_SHORT);
+		        greeting_instructions.setGravity(Gravity.CENTER, 0, -50);
+		        greeting_instructions.show();
+				isSender = false;
+				Main.this.retrieve_image_array();
 			Log.i("sendStartAnimation", "onAnimationEnd");
 			}
 			
@@ -174,8 +211,10 @@ public class Main extends Activity {
 	
 	//resets the game
 	private void reset(){
-		score = 0;
-		myScore.setText("Score:" + score);
+		//score = 0;
+		//myScore.setText("Score:" + score);
+		player1.resetScore();
+		player2.resetScore();
 		numOfRounds =3;
 		random_image_array.clear();
 		this.reset_button();
@@ -271,8 +310,9 @@ public class Main extends Activity {
 				button.setClickable(false);
 				button.setImageResource(inactive_image);
 				//increase score
-				score ++;
-				myScore.setText("Score:" + score);
+				receivePlayer.addScore();
+				receivePlayer.updateScoreboard();
+				//myScore.setText("Score:" + score);
 				random_image_array.remove(0);
 				Log.i("Main", "right");
 				if(random_image_array.size() == 0){
@@ -285,17 +325,20 @@ public class Main extends Activity {
 					nextround.setGravity(Gravity.CENTER, 0, -50);
 					nextround.show();
 					//update score
-					myScore.setText("Score:" + score);
+					receivePlayer.updateScoreboard();
+					//myScore.setText("Score:" + score);
 					for(int i = 0; i < 1000000 ; i++);
+					m.isSender = true;
 					// start next round
-					m.gameSetUpPerRound();
 					m.reset_button();
+					m.startRound();
+					
 				}//if
 			} else {
 				// display new scores
-				Toast toast = Toast.makeText(getApplicationContext(), "Game Over\nScore:" + score, Toast.LENGTH_LONG);
-				toast.setGravity(Gravity.CENTER, 0, -50);
-				toast.show();
+				//Toast toast = Toast.makeText(getApplicationContext(), "Game Over\nScore:" + score, Toast.LENGTH_LONG);
+				//toast.setGravity(Gravity.CENTER, 0, -50);
+				//toast.show();
 				// display 
 				m.reset_button();
 				Log.i("Main", "wrong");
@@ -452,15 +495,30 @@ public class Main extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        score = 0; // set the basic score to 0
+        
         // create base set of image id
         
         setContentView(R.layout.main);
         //Initialization
-        this.myScore = (TextView) findViewById(R.id.score_text);
-        this.image_0 = (ImageView) findViewById(R.id.image0);
-        this.image_1 = (ImageView) findViewById(R.id.image1);
-        this.image_2 = (ImageView) findViewById(R.id.image2);
+        
+        //Used to delay Actions for testing
+        mHandler.removeCallbacks(TimeDelay);
+        mHandler.postDelayed(TimeDelay, 5000);
+        
+        //UI Items
+        player1 = new Player();
+        player1.setName("Ted");
+        player1.scoreboard = (TextView) findViewById(R.id.score_text1);
+        player1.updateScoreboard();
+        //p1Score.setText(Player1.getName() + ": " + Player1.getScore());
+        player2 = new Player();
+        player2.setName("Barney");
+        player2.scoreboard = (TextView) findViewById(R.id.score_text2);
+        player2.updateScoreboard();
+        //p2Score.setText(Player2.getName() + ": " + Player2.getScore());
+        image_0 = (ImageView) findViewById(R.id.image0);
+        image_1 = (ImageView) findViewById(R.id.image1);
+        image_2 = (ImageView) findViewById(R.id.image2);
         sound_optn = (Button) findViewById (R.id.sound_optn);
         button0 = (ImageButton) findViewById(R.id.button0);
         button1 = (ImageButton) findViewById(R.id.button1);
