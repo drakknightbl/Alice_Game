@@ -26,8 +26,9 @@ public class Main extends Activity {
 	
 	private ArrayList<Integer> random_image_array = new ArrayList<Integer>();
 	private ArrayList<Integer> print_image_array = new ArrayList<Integer>();
+	private ArrayList<Integer> send_image_array = new ArrayList<Integer>();
 	
-	private boolean isSender; // true is sender false is receiver, ie. sender sets the order
+	private boolean isSender = false; // true is sender false is receiver, ie. sender sets the order
 	
 	private int score;
 	
@@ -64,8 +65,8 @@ public class Main extends Activity {
 	}//genOrder
 	
 	private void startSendAnimation(){
-		ImageView image = (ImageView) findViewById(print_image_array.get(0));
-		print_image_array.remove(0);
+		ImageView image = (ImageView) findViewById(send_image_array.get(0));
+		send_image_array.remove(0);
 		Animation move = AnimationUtils.loadAnimation(Main.this, R.anim.z_move_1);
 		move.setAnimationListener(new sendAnimListener());
 		image.startAnimation(move);
@@ -77,7 +78,7 @@ public class Main extends Activity {
 
 		@Override
 		public void onAnimationEnd(Animation animation) {
-			if(print_image_array.size() > 0){
+			if(send_image_array.size() > 0){
 				Main.this.startSendAnimation();
 			}else {
 			Log.i("sendStartAnimation", "onAnimationEnd");
@@ -135,13 +136,11 @@ public class Main extends Activity {
 
 		@Override
 		public void onAnimationRepeat(Animation animation) {
-			// TODO Auto-generated method stub
 			
 		}
 
 		@Override
 		public void onAnimationStart(Animation animation) {
-			// TODO Auto-generated method stub
 			
 		}
 		
@@ -186,13 +185,11 @@ public class Main extends Activity {
 				@Override
 				public void onAnimationStart(Animation animation) {
 					playAgainBtn.setClickable(false);
-					// TODO Auto-generated method stub
 					
 				}
 				
 				@Override
 				public void onAnimationRepeat(Animation animation) {
-					// TODO Auto-generated method stub
 					
 				}
 				
@@ -200,7 +197,6 @@ public class Main extends Activity {
 				public void onAnimationEnd(Animation animation) {
 					playAgainBtn.setVisibility(View.VISIBLE);
 					playAgainBtn.setClickable(true);
-					// TODO Auto-generated method stub
 					
 				}
 			});
@@ -244,18 +240,14 @@ public class Main extends Activity {
 		public void onClick(View v) {
 			Integer image_position_pressed = (Integer) v.getTag(R.string.image_position_tag);
 			if(isSender){
-				if(random_image_array.size() == 3){
-					//copy the array
-					for(int i = 0; i < random_image_array.size(); i++){
-			        	print_image_array.add(random_image_array.get(i));
-			        }// for
-					//start send animation
-				} else{
 				//disable button
 				button.setClickable(false);
 				button.setImageResource(inactive_image);
 				//Set the image into array
 				random_image_array.add(image_position_pressed);
+				send_image_array.add(image_position_pressed);
+				if(send_image_array.size() == 3){
+					m.sendSequence();
 				}
 			}else{ // isReceiver
 				// Below is Code for player to follow sequence
@@ -356,19 +348,16 @@ public class Main extends Activity {
 					public void onAnimationStart(Animation animation) {
 						tryAgainBtn.setClickable(false);
 						
-						// TODO Auto-generated method stub
 						
 					}
 					
 					@Override
 					public void onAnimationRepeat(Animation animation) {
-						// TODO Auto-generated method stub
 						
 					}
 					
 					@Override
 					public void onAnimationEnd(Animation animation) {
-						// TODO Auto-generated method stub
 						tryAgainBtn.setVisibility(View.VISIBLE);
 						tryAgainBtn.setClickable(true);
 					}
@@ -418,16 +407,28 @@ public class Main extends Activity {
 			Log.i("setSeqeunce()","Random number is " + rand_num);
 		}
 		*/
+		button0.setVisibility(View.INVISIBLE);
+		button1.setVisibility(View.INVISIBLE);
+		button2.setVisibility(View.INVISIBLE);
+
 		this.startSendAnimation();
-		// Send Random Image Array to Receiver's queue
+		// Send random_image_array to Receiver's queue
 		
 	}//sendSequence
+	
+	private ArrayList<Integer> retrieve_image_array(){
+		
+		return random_image_array;
+	}
 	
 	private void startRound(){
 		if(isSender){
 			image_array.add( new Integer(R.id.image0));
 	    	image_array.add( new Integer(R.id.image1));
 	        image_array.add( new Integer(R.id.image2));
+	        button0.setVisibility(View.VISIBLE);
+			button1.setVisibility(View.VISIBLE);
+			button2.setVisibility(View.VISIBLE);
 			
 		}else{
 			
@@ -470,7 +471,8 @@ public class Main extends Activity {
 		background_music.start();
         
 		//starts game here
-		this.gameSetUpPerRound();
+		this.startRound();
+		//this.gameSetUpPerRound();
         
         playAgainBtn.setOnClickListener(new myPlayAgainClickListener(this));
         tryAgainBtn.setOnClickListener(new myPlayAgainClickListener(this));
