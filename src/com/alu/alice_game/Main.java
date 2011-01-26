@@ -63,12 +63,46 @@ public class Main extends Activity {
 		return random_image_array;
 	}//genOrder
 	
-	// starts the animation of three characters and destroys print_image_array
+	private void startSendAnimation(){
+		ImageView image = (ImageView) findViewById(print_image_array.get(0));
+		print_image_array.remove(0);
+		Animation move = AnimationUtils.loadAnimation(Main.this, R.anim.z_move_1);
+		move.setAnimationListener(new sendAnimListener());
+		image.startAnimation(move);
+		
+		Log.i("Main","startSendAnimation()");
+	}
+	
+	private class sendAnimListener implements Animation.AnimationListener{
+
+		@Override
+		public void onAnimationEnd(Animation animation) {
+			if(print_image_array.size() > 0){
+				Main.this.startSendAnimation();
+			}else {
+			Log.i("sendStartAnimation", "onAnimationEnd");
+			}
+			
+		}//onAnimationEnd
+
+		@Override
+		public void onAnimationRepeat(Animation animation) {
+			
+		}
+
+		@Override
+		public void onAnimationStart(Animation animation) {
+			
+		}
+		
+	}//sendAnimListener
+	
+	// starts the animation of three characters when receiving and destroys print_image_array
 	private void startAnimation(){
 		//ArrayList<Integer> image_array_copy = random_image_array;
 		ImageView image = (ImageView) findViewById(print_image_array.get(0));
 		print_image_array.remove(0);
-		Animation move = AnimationUtils.loadAnimation(Main.this, R.anim.z_move_1);
+		Animation move = AnimationUtils.loadAnimation(Main.this, R.anim.z_move);
 		move.setAnimationListener(new AnimListener());
 		image.startAnimation(move);
 		
@@ -209,6 +243,78 @@ public class Main extends Activity {
 		@Override
 		public void onClick(View v) {
 			Integer image_position_pressed = (Integer) v.getTag(R.string.image_position_tag);
+			if(isSender){
+				if(random_image_array.size() == 3){
+					//copy the array
+					for(int i = 0; i < random_image_array.size(); i++){
+			        	print_image_array.add(random_image_array.get(i));
+			        }// for
+					//start send animation
+				} else{
+				//disable button
+				button.setClickable(false);
+				button.setImageResource(inactive_image);
+				//Set the image into array
+				random_image_array.add(image_position_pressed);
+				}
+			}else{ // isReceiver
+				// Below is Code for player to follow sequence
+			Integer image_position_current = random_image_array.get(0);
+			if(image_position_pressed.equals(image_position_current)) {
+				//disable button
+				button.setClickable(false);
+				button.setImageResource(inactive_image);
+				//increase score
+				score ++;
+				myScore.setText("Score:" + score);
+				random_image_array.remove(0);
+				Log.i("Main", "right");
+				if(random_image_array.size() == 0){
+					//end current round
+					String continue_msg ="\nStarting Round " + (4 - numOfRounds);
+					if(numOfRounds == 0){
+						continue_msg = "";
+					}
+					Toast nextround = Toast.makeText(getApplicationContext(), "Round Complete" + continue_msg, Toast.LENGTH_SHORT);
+					nextround.setGravity(Gravity.CENTER, 0, -50);
+					nextround.show();
+					//update score
+					myScore.setText("Score:" + score);
+					for(int i = 0; i < 1000000 ; i++);
+					// start next round
+					m.gameSetUpPerRound();
+					m.reset_button();
+				}//if
+			} else {
+				// display new scores
+				Toast toast = Toast.makeText(getApplicationContext(), "Game Over\nScore:" + score, Toast.LENGTH_LONG);
+				toast.setGravity(Gravity.CENTER, 0, -50);
+				toast.show();
+				// display 
+				m.reset_button();
+				Log.i("Main", "wrong");
+			}//else correct press
+			}//else (isSender)
+			// TODO Auto-generated method stub
+			
+		}
+		
+	}// myOnClick
+	/*
+	// Used to determine whether the clicks are right or wrong
+	private class myOnClick implements View.OnClickListener {
+
+		Main m;
+		ImageButton button;
+		
+		public myOnClick(Main m, ImageButton button){
+			this.m = m;
+			this.button = button;
+		}
+
+		@Override
+		public void onClick(View v) {
+			Integer image_position_pressed = (Integer) v.getTag(R.string.image_position_tag);
 			// Below is Code for player to follow sequence
 			Integer image_position_current = random_image_array.get(0);
 			if(image_position_pressed.equals(image_position_current)) {
@@ -276,6 +382,10 @@ public class Main extends Activity {
 		
 	}// myOnClick
 	
+	
+	
+	*/
+	
 	//To Reset the game when lost or win.
 	private class myPlayAgainClickListener implements View.OnClickListener{
 		Main m;
@@ -294,6 +404,36 @@ public class Main extends Activity {
 		}
 		
 	}// myPlayAgainClickListener
+	
+	
+	private void sendSequence(){
+		//Random r = new Random();
+		Log.i("sendSequence()", "before randomizer");
+		/*
+		//Random Setting Number
+		while(image_array.size() > 0){
+			int rand_num = r.nextInt(image_array.size());
+			random_image_array.add( image_array.get(rand_num));
+			image_array.remove(rand_num);
+			Log.i("setSeqeunce()","Random number is " + rand_num);
+		}
+		*/
+		this.startSendAnimation();
+		// Send Random Image Array to Receiver's queue
+		
+	}//sendSequence
+	
+	private void startRound(){
+		if(isSender){
+			image_array.add( new Integer(R.id.image0));
+	    	image_array.add( new Integer(R.id.image1));
+	        image_array.add( new Integer(R.id.image2));
+			
+		}else{
+			
+		}//else
+	
+	}//startRound
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -323,11 +463,14 @@ public class Main extends Activity {
 		button0.setVisibility(View.INVISIBLE);
 		button1.setVisibility(View.INVISIBLE);
 		button2.setVisibility(View.INVISIBLE);
-        
+
+		
 		background_music = MediaPlayer.create(getApplicationContext(), R.raw.freeze_ray);
 		background_music.setLooping(true);
 		background_music.start();
-        this.gameSetUpPerRound();
+        
+		//starts game here
+		this.gameSetUpPerRound();
         
         playAgainBtn.setOnClickListener(new myPlayAgainClickListener(this));
         tryAgainBtn.setOnClickListener(new myPlayAgainClickListener(this));
