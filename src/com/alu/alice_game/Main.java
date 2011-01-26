@@ -28,7 +28,7 @@ public class Main extends Activity {
 	private ArrayList<Integer> print_image_array = new ArrayList<Integer>();
 	private ArrayList<Integer> send_image_array = new ArrayList<Integer>();
 	
-	private boolean isSender = false; // true is sender false is receiver, ie. sender sets the order
+	private boolean isSender = true; // true is sender false is receiver, ie. sender sets the order
 	
 	private int score;
 	
@@ -81,6 +81,8 @@ public class Main extends Activity {
 			if(send_image_array.size() > 0){
 				Main.this.startSendAnimation();
 			}else {
+					isSender = false;
+					Main.this.retrieve_image_array();
 			Log.i("sendStartAnimation", "onAnimationEnd");
 			}
 			
@@ -246,6 +248,7 @@ public class Main extends Activity {
 				//Set the image into array
 				random_image_array.add(image_position_pressed);
 				send_image_array.add(image_position_pressed);
+				print_image_array.add(image_position_pressed);
 				if(send_image_array.size() == 3){
 					m.sendSequence();
 				}
@@ -287,7 +290,6 @@ public class Main extends Activity {
 				Log.i("Main", "wrong");
 			}//else correct press
 			}//else (isSender)
-			// TODO Auto-generated method stub
 			
 		}
 		
@@ -365,7 +367,6 @@ public class Main extends Activity {
 				tryAgainBtn.startAnimation(fade_in);
 				Log.i("Main", "wrong");
 			}
-			// TODO Auto-generated method stub
 			
 		}
 		
@@ -384,7 +385,6 @@ public class Main extends Activity {
 		
 		@Override
 		public void onClick(View v) {
-			// TODO Auto-generated method stub
 			playAgainBtn.setVisibility(View.INVISIBLE);
 			tryAgainBtn.setVisibility(View.INVISIBLE);
 			playAgainBtn.setClickable(false);
@@ -407,18 +407,20 @@ public class Main extends Activity {
 			Log.i("setSeqeunce()","Random number is " + rand_num);
 		}
 		*/
-		button0.setVisibility(View.INVISIBLE);
-		button1.setVisibility(View.INVISIBLE);
-		button2.setVisibility(View.INVISIBLE);
+		this.reset_button();
 
 		this.startSendAnimation();
 		// Send random_image_array to Receiver's queue
 		
 	}//sendSequence
 	
-	private ArrayList<Integer> retrieve_image_array(){
-		
-		return random_image_array;
+	private void retrieve_image_array(){
+		if(print_image_array.size() != 3){
+			//try to get message from server
+			Log.i("retrieve_image_array()", "Waiting for Retrieval");
+		}else{
+		this.startAnimation();
+		}
 	}
 	
 	private void startRound(){
@@ -431,7 +433,7 @@ public class Main extends Activity {
 			button2.setVisibility(View.VISIBLE);
 			
 		}else{
-			
+			this.retrieve_image_array();
 		}//else
 	
 	}//startRound
@@ -528,7 +530,6 @@ public class Main extends Activity {
 							//random_image_array.clear();
 							Log.i("Button0", "Wrong");
 						}//else
-						// TODO Auto-generated method stub
 						
 					}//onClick
 		    	   });// setOnClickListener
