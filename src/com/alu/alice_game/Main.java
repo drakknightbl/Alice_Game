@@ -333,48 +333,56 @@ public class Main extends Activity {
 				}
 			}else{ // isReceiver
 				if(isReceiver){
-				// Below is Code for player to follow sequence( receivePlayer)
-			Integer image_position_current = random_image_array.get(0);
-			if(image_position_pressed.equals(image_position_current)) {
-				//disable button
-				button.setClickable(false);
-				button.setImageResource(inactive_image);
-				//increase score
-				receivePlayer.setScore(receivePlayer.getScore() + 1);
-				receivePlayer.updateScoreboard();
-				//myScore.setText("Score:" + score);
-				random_image_array.remove(0);
-				Log.i("Main", "right");
-				if(random_image_array.size() == 0){
-					//end current round
-					String continue_msg ="\nStarting Round " + (4 - numOfRounds);
-					if(numOfRounds == 0){
-							continue_msg = "";
+					// Below is Code for player to follow sequence( receivePlayer)
+					Integer image_position_current = random_image_array.get(0);
+					// If the image order is correct
+					if(image_position_pressed.equals(image_position_current)) {
+						//disable button
+						button.setClickable(false);
+						button.setImageResource(inactive_image);
+						//increase score
+						receivePlayer.setScore(receivePlayer.getScore() + 1);
+						receivePlayer.updateScoreboard();
+						//myScore.setText("Score:" + score);
+						random_image_array.remove(0);
+						Log.i("Main", "right");
+						if(random_image_array.size() == 0){
+							//end current round
+							String continue_msg ="\nStarting Round " + (4 - numOfRounds);
+							numOfRounds --;
+							if(numOfRounds == 0){
+									continue_msg = "";
+								}
+							Toast nextround = Toast.makeText(getApplicationContext(), "Round Complete" + continue_msg, Toast.LENGTH_SHORT);
+							nextround.setGravity(Gravity.CENTER, 0, -50);
+							nextround.show();
+							//update score
+							receivePlayer.updateScoreboard();
+							//myScore.setText("Score:" + score);
+							for(int i = 0; i < 1000000 ; i++);
+							m.isSender = true;
+							m.isReceiver = false;
+							// start next round
+							m.reset_button();
+							m.multiPlayerSupport.sendMessage(sendPlayer, "swap=" + receivePlayer.getScore());
+							m.switchRoles();
+							m.startRound();
 						}
-					Toast nextround = Toast.makeText(getApplicationContext(), "Round Complete" + continue_msg, Toast.LENGTH_SHORT);
-					nextround.setGravity(Gravity.CENTER, 0, -50);
-					nextround.show();
-					//update score
-					receivePlayer.updateScoreboard();
-					//myScore.setText("Score:" + score);
-					for(int i = 0; i < 1000000 ; i++);
+					}//if
+				 else {
+					// display new scores
+					Toast toast = Toast.makeText(getApplicationContext(), "Round Failed", Toast.LENGTH_SHORT);
+					toast.setGravity(Gravity.CENTER, 0, -50);
+					toast.show();
 					m.isSender = true;
+					m.isReceiver = false;
 					// start next round
 					m.reset_button();
-					m.switchRoles();
 					m.multiPlayerSupport.sendMessage(sendPlayer, "swap=" + receivePlayer.getScore());
-					m.startRound();
-					}
-				}//if
-			} else {
-				// display new scores
-				Toast toast = Toast.makeText(getApplicationContext(), "Game Over", Toast.LENGTH_LONG);
-				toast.setGravity(Gravity.CENTER, 0, -50);
-				toast.show();
-				// display 
-				m.reset_button();
-				Log.i("Main", "wrong");
-			}//else correct press
+					m.switchRoles();
+					Log.i("Main", "wrong");
+				 }
+				}//else correct press
 			}//else (isSender)
 			
 		}
@@ -507,6 +515,7 @@ public class Main extends Activity {
 			String[] tokens = order.split(";");
 			Log.i("Main", "readMessage-number of tokens " + tokens.length);
 			//Creates print list
+			random_image_array.clear();
 			for(int i = 0; i < tokens.length; i++){	
 				print_image_array.add(normal_image_map.get(tokens[i]));
 				random_image_array.add(normal_image_map.get(tokens[i]));
