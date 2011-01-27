@@ -2,6 +2,7 @@ package com.alu.alice_game;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Random;
 
 import com.alu.alice_game.server.MultiPlayerAwsSupportImpl;
@@ -32,10 +33,16 @@ public class Main extends Activity {
 	//private static int IMAGE_POSITION_TAG = 0;
 	
 	private ArrayList<Integer> image_array = new ArrayList<Integer>();
-	
+	private HashMap<Integer, String> inverted_image_map = new HashMap<Integer, String>();
+	private HashMap<String, Integer> normal_image_map = new HashMap<String, Integer>();
 	private ArrayList<Integer> random_image_array = new ArrayList<Integer>();
 	private ArrayList<Integer> print_image_array = new ArrayList<Integer>();
 	private ArrayList<Integer> send_image_array = new ArrayList<Integer>();
+	
+	//{R.id.image_1 => '1' }
+	
+	//{'1' => R.id.image_1 }
+	
 	
 	// sender sets the order
 	private boolean isSender = true; 
@@ -100,12 +107,12 @@ public class Main extends Activity {
 	private ArrayList<Integer> genOrder(){
 		ArrayList<Integer> random_image_array = new ArrayList<Integer>();
 		Random r = new Random();
-		Log.i("genOrder()", "before while");
+		Log.i("Main", "genOrder - before while");
 		while(image_array.size() > 0){
 			int rand_num = r.nextInt(image_array.size());
 			random_image_array.add( image_array.get(rand_num));
 			image_array.remove(rand_num);
-			Log.i("Main","Random number is " + rand_num);
+			Log.i("Main","genOrder - Random number is " + rand_num);
 		}
 		return random_image_array;
 	}//genOrder
@@ -134,14 +141,18 @@ public class Main extends Activity {
 				Main.this.startSendAnimation();
 			}else {
 				String msg = "";
-				//isSender = false;
-				//Main.this.retrieve_image_array();
+				isSender = false;
+				isReceiver = true;
+				Main.this.retrieve_image_array();
+				/*
 				// Wait for Click to Finish
 				while (msg.equals("")){
 					msg = m.multiPlayerSupport.checkForMessage(receivePlayer);
 					m.readMessage(msg);
-				}
-			Log.i("sendStartAnimation", "onAnimationEnd");
+				}	
+				*/
+				
+			Log.i("Main", "sendStartAnimation - onAnimationEnd");
 			}
 			
 		}//onAnimationEnd
@@ -265,7 +276,7 @@ public class Main extends Activity {
 	        playAgainBtn.startAnimation(fade_in);
 	        background_music.stop();
 	        
-			Log.i("gameSetUpPerRound", "Win");
+			Log.i("Main", "gameSetUpPerRound - Win");
 		}// if
 		else{
 			image_array.add( new Integer(R.id.image0));
@@ -308,12 +319,12 @@ public class Main extends Activity {
 				//Set the image into array
 				random_image_array.add(image_position_pressed);
 				send_image_array.add(image_position_pressed);
-				print_image_array.add(image_position_pressed);
+				//print_image_array.add(image_position_pressed);
 				Log.i("Main", "onClick " + image_position_pressed );
 				if(send_image_array.size() == 3){
 					String msg = "plus=";
 					for(int i = 0; i < 3; i++){
-						msg += send_image_array.get(i) + ";";
+						msg += inverted_image_map.get(send_image_array.get(i)) + ";";
 					}
 					
 					multiPlayerSupport.sendMessage(receivePlayer, msg);
@@ -478,43 +489,43 @@ public class Main extends Activity {
 	}
 	
 	private void sendSequence(){
-		//Random r = new Random();
-		Log.i("sendSequence()", "before randomizer");
-		/*
-		//Random Setting Number
-		while(image_array.size() > 0){
-			int rand_num = r.nextInt(image_array.size());
-			random_image_array.add( image_array.get(rand_num));
-			image_array.remove(rand_num);
-			Log.i("setSeqeunce()","Random number is " + rand_num);
-		}
-		*/
 		this.reset_button();
 
 		this.startSendAnimation();
 		// Send random_image_array to Receiver's queue
+		Log.i("Main", "sendSequence");
 		
 	}//sendSequence
 	
 	
 	private void readMessage(String msg){
-		String key = msg.substring(0, 4);
+		String key = msg.substring(0, 5);
+		Log.i("Main", "readMessage-Key: " + key);
 		if(key.equals("plus=")){
 			String order = msg.substring(5);
+			Log.i("Main", "readMessage-order " + order);
+			String[] tokens = order.split(";");
+			Log.i("Main", "readMessage-number of tokens " + tokens.length);
 			//Creates print list
-			while(! order.equals("")){
-				
+			for(int i = 0; i < tokens.length; i++){	
+				print_image_array.add(normal_image_map.get(tokens[i]));
+				random_image_array.add(normal_image_map.get(tokens[i]));
+				Log.i("Main", "readMessage-token " + tokens[i]);
 			}
 			
 			this.startAnimation();
 		}
 		if(key.equals("swap=")){
+			int oldscore = receivePlayer.getScore();
 			receivePlayer.setScore(Integer.parseInt( msg.substring(5, msg.length() - 1 )));
+			Toast score = Toast.makeText(getApplicationContext(), receivePlayer.getScore() - oldscore, Toast.LENGTH_SHORT);
+			score.setGravity(Gravity.CENTER, 0, -50);
+			score.show();
 			this.switchRoles();
 			
 		}
 		if(msg.equals("a new message")){
-			Log.i("Main.readMessage", "got new Message");
+			Log.i("Main", "readMessage - got new Message");
 		}
 	
 	}
@@ -524,22 +535,25 @@ public class Main extends Activity {
 		if (print_image_array.size() == 3){
 				this.startAnimation();
 		}else{
-				//try to get message from server
+			//try to get message from server
 			while(msg.equals("")){
 			msg = multiPlayerSupport.checkForMessage(receivePlayer);
-			}
-		this.readMessage(msg);
-		Log.i("retrieve_image_array()", "Waiting for Retrieval");
-	
+		}
+		//this.readMessage(msg);
+		// hard coded for testing
+			
+		this.readMessage("plus=0;1;2;");
+		Log.i("Main", "retrieve_image_array - Waiting for Retrieval");		
+
 		}
 	}
 	
 	private void startRound(){
+		image_array.add( new Integer(R.id.image0));
+    	image_array.add( new Integer(R.id.image1));
+        image_array.add( new Integer(R.id.image2));
 		if(isSender){
-			image_array.add( new Integer(R.id.image0));
-	    	image_array.add( new Integer(R.id.image1));
-	        image_array.add( new Integer(R.id.image2));
-	        button0.setVisibility(View.VISIBLE);
+			button0.setVisibility(View.VISIBLE);
 			button1.setVisibility(View.VISIBLE);
 			button2.setVisibility(View.VISIBLE);
 			Toast greeting_instructions = Toast.makeText(getApplicationContext(), "Set the Order", Toast.LENGTH_SHORT);
@@ -549,9 +563,9 @@ public class Main extends Activity {
 		}else{
 			if(isReceiver){
 			this.retrieve_image_array();
-			Log.i("startRound", "isReceiver");
+			Log.i("Main", "startRound - isReceiver");
 			}else{
-				Log.i("startRound", "Error not suppose to print this");
+				Log.i("Main", "startRound - Error not suppose to print this");
 			}
 		}//else
 	
@@ -569,7 +583,16 @@ public class Main extends Activity {
         //Used to delay Actions for testing
         mHandler.removeCallbacks(TimeDelay);
         mHandler.postDelayed(TimeDelay, 5000);
+
+        inverted_image_map.put(new Integer(R.id.image0), "0");
+        inverted_image_map.put(new Integer(R.id.image1), "1");
+        inverted_image_map.put(new Integer(R.id.image2), "2");
         
+        normal_image_map.put("0", new Integer(R.id.image0));
+        normal_image_map.put("1", new Integer(R.id.image1));
+        normal_image_map.put("2", new Integer(R.id.image2));
+        
+        // get Players
         Collection<Player> players = multiPlayerSupport.getOnlinePlayers();
         Object [] inGamePlayers;
         inGamePlayers = players.toArray();
@@ -650,37 +673,7 @@ public class Main extends Activity {
         // 3 Image Buttons
 		button0.setTag(R.string.image_position_tag, new Integer(R.id.image0));
 		button0.setOnClickListener(new myOnClick(this, button0));
-		    	      	   
-		    	   /*
-		    	   button0.setOnClickListener(new View.OnClickListener() {
-					
-					@Override
-					public void onClick(View v) {
-						Integer image = R.id.image0;
-						if( image.equals(random_image_array.get(0))){
-							// disable button
-							button0.setClickable(false);
-							
-							// increase score
-							score++;
-							myScore.setText("Score: " + score);
-							//remove element
-							random_image_array.remove(0);
-							Log.i("Button0", "Right");
-						}//if
-						else{
-							score--;
-							myScore.setText("Score:" + score);
-							//Lose Animation
-							//display Try Again Text
-							//random_image_array.clear();
-							Log.i("Button0", "Wrong");
-						}//else
-						
-					}//onClick
-		    	   });// setOnClickListener
-		    	   */
-		    	   
+	   	   
 		button1.setTag(R.string.image_position_tag, new Integer(R.id.image1));
 		button1.setOnClickListener(new myOnClick(this, button1));
 		    	  
