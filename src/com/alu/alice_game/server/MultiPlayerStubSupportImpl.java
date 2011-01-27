@@ -14,7 +14,7 @@ public class MultiPlayerStubSupportImpl implements MultiPlayerSupport {
 		player1.setName("player_1");
 		
 		Player player2 = new Player();
-		player1.setName("player_2");
+		player2.setName("player_2");
 		
 		Collection<Player> players = new ArrayList<Player>();
 		players.add(player1);

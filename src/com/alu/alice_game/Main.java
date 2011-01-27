@@ -40,8 +40,8 @@ public class Main extends Activity {
 	// sender sets the order
 	private boolean isSender = true; 
 	
-	//receiver tries to playback the order
-	private boolean isReceiver = true;
+	//receiver tries to play back the order
+	private boolean isReceiver = false;
 	
 	private Handler mHandler = new Handler();
 	
@@ -63,8 +63,9 @@ public class Main extends Activity {
 	private MediaPlayer background_music;
 	
 	private MultiPlayerSupport multiPlayerSupport;
-	private Collection<Player> inGamePlayers;
+	// Player 1 always the user on the Phone
 	private Player player1;
+	//Player they are playing against
 	private Player player2;
 	private Player sendPlayer;
 	private Player receivePlayer;
@@ -113,24 +114,33 @@ public class Main extends Activity {
 		ImageView image = (ImageView) findViewById(send_image_array.get(0));
 		send_image_array.remove(0);
 		Animation move = AnimationUtils.loadAnimation(Main.this, R.anim.z_move_1);
-		move.setAnimationListener(new sendAnimListener());
+		move.setAnimationListener(new sendAnimListener(this));
 		image.startAnimation(move);
 		
 		Log.i("Main","startSendAnimation()");
 	}
 	
 	private class sendAnimListener implements Animation.AnimationListener{
+		
+		Main m;
+		
+		sendAnimListener(Main m){
+			this.m=m;
+		}
 
 		@Override
 		public void onAnimationEnd(Animation animation) {
 			if(send_image_array.size() > 0){
 				Main.this.startSendAnimation();
 			}else {
-				Toast greeting_instructions = Toast.makeText(getApplicationContext(), "Set the Order", Toast.LENGTH_SHORT);
-		        greeting_instructions.setGravity(Gravity.CENTER, 0, -50);
-		        greeting_instructions.show();
-				isSender = false;
-				Main.this.retrieve_image_array();
+				String msg = "";
+				//isSender = false;
+				//Main.this.retrieve_image_array();
+				// Wait for Click to Finish
+				while (msg.equals("")){
+					msg = m.multiPlayerSupport.checkForMessage(receivePlayer);
+					m.readMessage(msg);
+				}
 			Log.i("sendStartAnimation", "onAnimationEnd");
 			}
 			
@@ -299,18 +309,27 @@ public class Main extends Activity {
 				random_image_array.add(image_position_pressed);
 				send_image_array.add(image_position_pressed);
 				print_image_array.add(image_position_pressed);
+				Log.i("Main", "onClick " + image_position_pressed );
 				if(send_image_array.size() == 3){
+					String msg = "plus=";
+					for(int i = 0; i < 3; i++){
+						msg += send_image_array.get(i) + ";";
+					}
+					
+					multiPlayerSupport.sendMessage(receivePlayer, msg);
+					
 					m.sendSequence();
 				}
 			}else{ // isReceiver
-				// Below is Code for player to follow sequence
+				if(isReceiver){
+				// Below is Code for player to follow sequence( receivePlayer)
 			Integer image_position_current = random_image_array.get(0);
 			if(image_position_pressed.equals(image_position_current)) {
 				//disable button
 				button.setClickable(false);
 				button.setImageResource(inactive_image);
 				//increase score
-				receivePlayer.addScore();
+				receivePlayer.setScore(receivePlayer.getScore() + 1);
 				receivePlayer.updateScoreboard();
 				//myScore.setText("Score:" + score);
 				random_image_array.remove(0);
@@ -319,8 +338,8 @@ public class Main extends Activity {
 					//end current round
 					String continue_msg ="\nStarting Round " + (4 - numOfRounds);
 					if(numOfRounds == 0){
-						continue_msg = "";
-					}
+							continue_msg = "";
+						}
 					Toast nextround = Toast.makeText(getApplicationContext(), "Round Complete" + continue_msg, Toast.LENGTH_SHORT);
 					nextround.setGravity(Gravity.CENTER, 0, -50);
 					nextround.show();
@@ -331,14 +350,16 @@ public class Main extends Activity {
 					m.isSender = true;
 					// start next round
 					m.reset_button();
+					m.switchRoles();
+					m.multiPlayerSupport.sendMessage(sendPlayer, "swap=" + receivePlayer.getScore());
 					m.startRound();
-					
+					}
 				}//if
 			} else {
 				// display new scores
-				//Toast toast = Toast.makeText(getApplicationContext(), "Game Over\nScore:" + score, Toast.LENGTH_LONG);
-				//toast.setGravity(Gravity.CENTER, 0, -50);
-				//toast.show();
+				Toast toast = Toast.makeText(getApplicationContext(), "Game Over", Toast.LENGTH_LONG);
+				toast.setGravity(Gravity.CENTER, 0, -50);
+				toast.show();
 				// display 
 				m.reset_button();
 				Log.i("Main", "wrong");
@@ -448,6 +469,13 @@ public class Main extends Activity {
 		
 	}// myPlayAgainClickListener
 	
+	// To switch Receiver and 
+	private void switchRoles(){
+		Player temp = sendPlayer;
+		sendPlayer= receivePlayer;
+		receivePlayer = temp;
+		
+	}
 	
 	private void sendSequence(){
 		//Random r = new Random();
@@ -468,12 +496,41 @@ public class Main extends Activity {
 		
 	}//sendSequence
 	
+	
+	private void readMessage(String msg){
+		String key = msg.substring(0, 4);
+		if(key.equals("plus=")){
+			String order = msg.substring(5);
+			//Creates print list
+			while(! order.equals("")){
+				
+			}
+			
+			this.startAnimation();
+		}
+		if(key.equals("swap=")){
+			receivePlayer.setScore(Integer.parseInt( msg.substring(5, msg.length() - 1 )));
+			this.switchRoles();
+			
+		}
+		if(msg.equals("a new message")){
+			Log.i("Main.readMessage", "got new Message");
+		}
+	
+	}
+	
 	private void retrieve_image_array(){
-		if(print_image_array.size() != 3){
-			//try to get message from server
-			Log.i("retrieve_image_array()", "Waiting for Retrieval");
+		String msg = "";
+		if (print_image_array.size() == 3){
+				this.startAnimation();
 		}else{
-		this.startAnimation();
+				//try to get message from server
+			while(msg.equals("")){
+			msg = multiPlayerSupport.checkForMessage(receivePlayer);
+			}
+		this.readMessage(msg);
+		Log.i("retrieve_image_array()", "Waiting for Retrieval");
+	
 		}
 	}
 	
@@ -485,9 +542,17 @@ public class Main extends Activity {
 	        button0.setVisibility(View.VISIBLE);
 			button1.setVisibility(View.VISIBLE);
 			button2.setVisibility(View.VISIBLE);
+			Toast greeting_instructions = Toast.makeText(getApplicationContext(), "Set the Order", Toast.LENGTH_SHORT);
+	        greeting_instructions.setGravity(Gravity.CENTER, 0, -50);
+	        greeting_instructions.show();
 			
 		}else{
+			if(isReceiver){
 			this.retrieve_image_array();
+			Log.i("startRound", "isReceiver");
+			}else{
+				Log.i("startRound", "Error not suppose to print this");
+			}
 		}//else
 	
 	}//startRound
@@ -505,17 +570,25 @@ public class Main extends Activity {
         mHandler.removeCallbacks(TimeDelay);
         mHandler.postDelayed(TimeDelay, 5000);
         
+        Collection<Player> players = multiPlayerSupport.getOnlinePlayers();
+        Object [] inGamePlayers;
+        inGamePlayers = players.toArray();
         //UI Items
-        player1 = new Player();
-        player1.setName("Ted");
+        player1 = (Player) inGamePlayers[0];
         player1.scoreboard = (TextView) findViewById(R.id.score_text1);
         player1.updateScoreboard();
         //p1Score.setText(Player1.getName() + ": " + Player1.getScore());
-        player2 = new Player();
-        player2.setName("Barney");
+        player2 = (Player) inGamePlayers[1];
         player2.scoreboard = (TextView) findViewById(R.id.score_text2);
         player2.updateScoreboard();
         //p2Score.setText(Player2.getName() + ": " + Player2.getScore());
+        if(isSender){
+        	sendPlayer = player1;
+        	receivePlayer = player2;
+        } else {
+        	sendPlayer = player2;
+        	receivePlayer =player1;
+        }
         image_0 = (ImageView) findViewById(R.id.image0);
         image_1 = (ImageView) findViewById(R.id.image1);
         image_2 = (ImageView) findViewById(R.id.image2);
@@ -559,9 +632,13 @@ public class Main extends Activity {
 					if(background_music.isPlaying()){
 						background_music.pause();
 						//unmute image
+						isSender =true;
+						isReceiver = false;
 					}//if
 					else{
 						background_music.start();
+						isSender = false;
+						isReceiver = true;
 						//mute image
 					}//else
 				} catch(IllegalStateException e){

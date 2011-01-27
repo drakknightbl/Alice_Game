@@ -22,7 +22,10 @@ public class Player implements Serializable {
 	public TextView scoreboard;
 
 	public Player(){
-		name = "John Doe";
+		this("John Doe");
+	}
+	public Player(String name){
+		this.name = name;
 		score = 0;
 	}
 	
@@ -38,8 +41,8 @@ public class Player implements Serializable {
 		return score; 
 	}
 	
-	public void addScore(){
-		score++;
+	public void setScore (int n){
+		score =n;
 	}
 	//resets score of the player to 0
 	public void resetScore(){
