@@ -38,21 +38,16 @@ public class Main extends Activity {
 	private ArrayList<Integer> random_image_array = new ArrayList<Integer>();
 	private ArrayList<Integer> print_image_array = new ArrayList<Integer>();
 	private ArrayList<Integer> send_image_array = new ArrayList<Integer>();
-	
-	//{R.id.image_1 => '1' }
-	
-	//{'1' => R.id.image_1 }
-	
-	
+	//Flags
 	// sender sets the order
 	private boolean isSender = true; 
-	
 	//receiver tries to play back the order
 	private boolean isReceiver = false;
+	//Used to tell when both players have swapped once
+	private boolean swapped = true;
 	
+	//Items
 	private Handler mHandler = new Handler();
-	
-	
 	private Button sound_optn;
 	private ImageButton button0;
 	private ImageButton button1;
@@ -184,10 +179,9 @@ public class Main extends Activity {
 	
 	//Checks for End of animation and starts the next animation.
 	private class AnimListener implements Animation.AnimationListener{
-
+		
 		@Override
 		public void onAnimationEnd(Animation animation) {
-			// TODO Auto-generated method stub
 			if( print_image_array.size() > 0 ){
 			Main.this.startAnimation();
 			}
@@ -348,18 +342,26 @@ public class Main extends Activity {
 						Log.i("Main", "right");
 						if(random_image_array.size() == 0){
 							//end current round
-							String continue_msg ="\nStarting Round " + (4 - numOfRounds);
-							numOfRounds --;
+							String continue_msg = "";
+							if(swapped){
+								//continue_msg ="\nStarting Round " + (4 - numOfRounds);
+								numOfRounds --;
+							}
 							if(numOfRounds == 0){
 									continue_msg = "";
 								}
 							Toast nextround = Toast.makeText(getApplicationContext(), "Round Complete" + continue_msg, Toast.LENGTH_SHORT);
 							nextround.setGravity(Gravity.CENTER, 0, -50);
 							nextround.show();
-							//update score
+								//update score
 							receivePlayer.updateScoreboard();
 							//myScore.setText("Score:" + score);
-							for(int i = 0; i < 1000000 ; i++);
+							//for receivePlayer
+							if(swapped){ 
+								swapped = false;
+							} else {
+								swapped = true; 
+							}
 							m.isSender = true;
 							m.isReceiver = false;
 							// start next round
@@ -371,7 +373,16 @@ public class Main extends Activity {
 					}//if
 				 else {
 					// display new scores
-					Toast toast = Toast.makeText(getApplicationContext(), "Round Failed", Toast.LENGTH_SHORT);
+					String continue_msg = "";
+					//for receivePlayer set Flags
+					if(swapped){ 
+						continue_msg ="\nStarting Round " + (4 - numOfRounds);
+						numOfRounds-- ;
+						swapped = false;
+					} else {
+						swapped = true; 
+					}
+					Toast toast = Toast.makeText(getApplicationContext(), "Round Failed" + continue_msg, Toast.LENGTH_SHORT);
 					toast.setGravity(Gravity.CENTER, 0, -50);
 					toast.show();
 					m.isSender = true;
@@ -380,6 +391,7 @@ public class Main extends Activity {
 					m.reset_button();
 					m.multiPlayerSupport.sendMessage(sendPlayer, "swap=" + receivePlayer.getScore());
 					m.switchRoles();
+					m.startRound();
 					Log.i("Main", "wrong");
 				 }
 				}//else correct press
@@ -501,6 +513,11 @@ public class Main extends Activity {
 
 		this.startSendAnimation();
 		// Send random_image_array to Receiver's queue
+		String msg ="";
+		while(msg.equals("")){
+			msg = multiPlayerSupport.checkForMessage(receivePlayer);
+		}
+		//this.readMessage(msg);
 		Log.i("Main", "sendSequence");
 		
 	}//sendSequence
@@ -525,6 +542,8 @@ public class Main extends Activity {
 			this.startAnimation();
 		}
 		if(key.equals("swap=")){
+			if(swapped){ swapped = false;}
+			else { swapped = true; }
 			int oldscore = receivePlayer.getScore();
 			receivePlayer.setScore(Integer.parseInt( msg.substring(5, msg.length() - 1 )));
 			Toast score = Toast.makeText(getApplicationContext(), receivePlayer.getScore() - oldscore, Toast.LENGTH_SHORT);
@@ -558,26 +577,51 @@ public class Main extends Activity {
 	}
 	
 	private void startRound(){
-		image_array.add( new Integer(R.id.image0));
-    	image_array.add( new Integer(R.id.image1));
-        image_array.add( new Integer(R.id.image2));
-		if(isSender){
-			button0.setVisibility(View.VISIBLE);
-			button1.setVisibility(View.VISIBLE);
-			button2.setVisibility(View.VISIBLE);
-			Toast greeting_instructions = Toast.makeText(getApplicationContext(), "Set the Order", Toast.LENGTH_SHORT);
-	        greeting_instructions.setGravity(Gravity.CENTER, 0, -50);
-	        greeting_instructions.show();
+		if(numOfRounds == 0){
+			if(player1.getScore() > player2.getScore()){
+				//player1 WINS
+				Log.i("Main", player1.getName() + " won " + player2.getName());
+			}else{
+				if(player1.getScore() == player2.getScore()){
+					//both players are tied
+					Log.i("Main", player1.getName() + " and " + player2.getName() + "tied");
+				}else{
+					//player1 lost
+					Log.i("Main", player1.getName() + " lost to " + player2.getName());
+				}
+			}
 			
 		}else{
-			if(isReceiver){
-			this.retrieve_image_array();
-			Log.i("Main", "startRound - isReceiver");
+			image_array.add( new Integer(R.id.image0));
+	    	image_array.add( new Integer(R.id.image1));
+	        image_array.add( new Integer(R.id.image2));
+			if(isSender){
+				button0.setVisibility(View.VISIBLE);
+				button1.setVisibility(View.VISIBLE);
+				button2.setVisibility(View.VISIBLE);
+				if((numOfRounds == 3) && swapped){
+			        Toast round = Toast.makeText(getApplicationContext(), "Starting Round 1", Toast.LENGTH_SHORT);
+			        round.setGravity(Gravity.CENTER, 0, -50);
+			        round.show();
+			        }// if
+				Toast greeting_instructions = Toast.makeText(getApplicationContext(), "Set the Order", Toast.LENGTH_SHORT);
+		        greeting_instructions.setGravity(Gravity.CENTER, 0, -50);
+		        greeting_instructions.show();
+				
 			}else{
-				Log.i("Main", "startRound - Error not suppose to print this");
-			}
-		}//else
-	
+				if(isReceiver){
+					if((numOfRounds == 3) && swapped){
+				        Toast round = Toast.makeText(getApplicationContext(), "Starting Round 1", Toast.LENGTH_SHORT);
+				        round.setGravity(Gravity.CENTER, 0, -50);
+				        round.show();
+			        }// if
+					this.retrieve_image_array();
+					Log.i("Main", "startRound - isReceiver");
+				}else{
+					Log.i("Main", "startRound - Error not suppose to print this");
+				}
+			}//else
+		}	
 	}//startRound
 	
     @Override
