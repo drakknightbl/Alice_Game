@@ -7,7 +7,7 @@
     		 	android:toYDelta="120"
     		 	android:duration="1000" /> 	
     		 	
- 
+<!-- 
     <translate  android:startOffset="1000"
     			android:fromXDelta="0%p" 
     		 	android:toXDelta="256" 
@@ -28,7 +28,7 @@
     		 	android:fromYDelta="0"
     		 	android:toYDelta="-20%p"
     		 	android:duration="1000" />
-   
+--> 
  <!--   
     <translate  android:fromXDelta="100%p" 
     		 	android:toXDelta="0" 
