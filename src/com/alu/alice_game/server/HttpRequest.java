@@ -26,11 +26,9 @@ public class HttpRequest {
         * @param files
         * @return
         */
-        public HttpData post(String sUrl, List<NameValuePair>nameValuePairs) {
-                HttpData ret = new HttpData();
+        public void post(String sUrl, List<NameValuePair>nameValuePairs) {
                 HttpThread ht = new HttpThread(sUrl, nameValuePairs);
                 ht.run();
-                return ret;
         }
         
         class HttpThread extends Thread {
