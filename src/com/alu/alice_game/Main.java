@@ -4,11 +4,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.Properties;
 
 import com.alu.alice_game.server.MultiPlayerAwsSupportImpl;
 import com.alu.alice_game.server.MultiPlayerStubSupportImpl;
+import com.alu.alice_game.server.MultiPlayerServerSupportImpl;
 import com.alu.alice_game.server.MultiPlayerSupport;
 import com.alu.alice_game.domain.Player;
+
+import com.amazonaws.auth.BasicAWSCredentials;
 
 
 import android.app.Activity;
@@ -31,6 +35,10 @@ import android.widget.Toast;
 public class Main extends Activity {
 	
 	//private static int IMAGE_POSITION_TAG = 0;
+
+        public static BasicAWSCredentials credentials = null;
+
+        private boolean credentials_found;
 	
 	private ArrayList<Integer> image_array = new ArrayList<Integer>();
 	private HashMap<Integer, String> inverted_image_map = new HashMap<Integer, String>();
@@ -75,8 +83,15 @@ public class Main extends Activity {
 	private Player receivePlayer ;
 	
 	public Main() {
-		//multiPlayerSupport = new MultiPlayerStubSupportImpl();
-		// multiPlayerSupport = new MultiPlayerAwsSupportImpl();
+                // Non Amazon
+		// multiPlayerSupport = new MultiPlayerStubSupportImpl();
+                
+                // Amazon
+                //multiPlayerSupport =  new MultiPlayerAwsSupportImpl(player1Name, player2Name);
+
+                // Server side (instead of amazon for now)
+                multiPlayerSupport = new MultiPlayerServerSupportImpl();
+
 	}
 	
 	// Used to make a timer
@@ -625,6 +640,22 @@ public class Main extends Activity {
 			}//else
 		}	
 	}//startRound
+
+
+    private final Runnable postResults = new Runnable() {
+        @Override
+        public void run() {
+            updateUi();
+        }
+
+    };
+
+
+    private void updateUi() {
+        if(credentials_found == false) {
+            Toast.makeText(Main.this, "Credential not configured properly", Toast.LENGTH_SHORT);
+        }
+    }
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -647,20 +678,17 @@ public class Main extends Activity {
         normal_image_map.put("1", new Integer(R.id.image1));
         normal_image_map.put("2", new Integer(R.id.image2));
         
-        // get Players
-        multiPlayerSupport =  new MultiPlayerAwsSupportImpl(player1Name, player2Name);
+
         Collection<Player> players = multiPlayerSupport.getOnlinePlayers();
         Object [] inGamePlayers;
         inGamePlayers = players.toArray();
         //UI Items
         player1 = (Player) inGamePlayers[0];
         player1.scoreboard = (TextView) findViewById(R.id.score_text1);
-        player1.setName(player1Name);
         player1.updateScoreboard();
         //p1Score.setText(Player1.getName() + ": " + Player1.getScore());
         player2 = (Player) inGamePlayers[1];
         player2.scoreboard = (TextView) findViewById(R.id.score_text2);
-        player2.setName(player2Name);
         player2.updateScoreboard();
         //p2Score.setText(Player2.getName() + ": " + Player2.getScore());
         if(isSender){
@@ -740,8 +768,43 @@ public class Main extends Activity {
 		    	
 		    	
         Log.i("Main", "onCreate");
+
+        startGetCredentials();
+
     }// onCreate
-    
+   
+    private void startGetCredentials() {
+        Thread t = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    Properties properties = new Properties();
+                    properties.load(getClass().getResourceAsStream("AwsCredentials.properties"));
+
+                    String accessKeyId = properties.getProperty("accessKey");
+                    String secretKey = properties.getProperty("secretKey");
+
+                    if ( ( accessKeyId == null ) || (accessKeyId.equals("") ) || ( accessKeyId.equals("CHANGEME")) || ( secretKey == null) || ( secretKey.equals("") ) || (secretKey.equals("CHANGEME") ) ) {
+                        Log.e("Main", "Aws credentials not configured correctly.");
+                        credentials_found = false;
+                    } else {
+                        credentials = new BasicAWSCredentials(properties.getProperty("accessKey" ), properties.getProperty("secretKey") );
+                        credentials_found = true;
+                    }
+
+                } catch (Exception exception) {
+                    Log.e("Main", "Loading AWS Credentials : " + exception.getMessage());
+                    credentials_found = false;
+                }
+
+                Main.this.mHandler.post(postResults);
+            }
+
+
+        };
+        t.start();
+
+    } 
     
     public void onStop(){
     	//Stops background music if it is playing.
