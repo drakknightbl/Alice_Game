@@ -20,6 +20,9 @@ public class Player implements Serializable {
 	
 	//view to print score to
 	public TextView scoreboard;
+	
+	//Queue URL of Player
+	private String queueURL;
 
 	public Player(){
 		this("John Doe");
@@ -52,6 +55,13 @@ public class Player implements Serializable {
 	// Updates the score on the screen
 	public void updateScoreboard(){
 		scoreboard.setText(name + ": " + score );
+	}
+	
+	public String getURL(){
+		return queueURL;
+	}
+	public void setURL(String url){
+		queueURL = url;
 	}
 
 }

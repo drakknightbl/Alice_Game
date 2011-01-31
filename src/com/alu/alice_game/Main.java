@@ -67,13 +67,15 @@ public class Main extends Activity {
 	private MultiPlayerSupport multiPlayerSupport;
 	// Player 1 always the user on the Phone
 	private Player player1;
+	private String player1Name = "Player 1";
 	//Player they are playing against
 	private Player player2;
+	private String player2Name = "Player 2";
 	private Player sendPlayer;
-	private Player receivePlayer;
+	private Player receivePlayer ;
 	
 	public Main() {
-		multiPlayerSupport = new MultiPlayerStubSupportImpl();
+		//multiPlayerSupport = new MultiPlayerStubSupportImpl();
 		// multiPlayerSupport = new MultiPlayerAwsSupportImpl();
 	}
 	
@@ -646,16 +648,19 @@ public class Main extends Activity {
         normal_image_map.put("2", new Integer(R.id.image2));
         
         // get Players
+        multiPlayerSupport =  new MultiPlayerAwsSupportImpl(player1Name, player2Name);
         Collection<Player> players = multiPlayerSupport.getOnlinePlayers();
         Object [] inGamePlayers;
         inGamePlayers = players.toArray();
         //UI Items
         player1 = (Player) inGamePlayers[0];
         player1.scoreboard = (TextView) findViewById(R.id.score_text1);
+        player1.setName(player1Name);
         player1.updateScoreboard();
         //p1Score.setText(Player1.getName() + ": " + Player1.getScore());
         player2 = (Player) inGamePlayers[1];
         player2.scoreboard = (TextView) findViewById(R.id.score_text2);
+        player2.setName(player2Name);
         player2.updateScoreboard();
         //p2Score.setText(Player2.getName() + ": " + Player2.getScore());
         if(isSender){

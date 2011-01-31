@@ -30,7 +30,7 @@ public class MultiPlayerStubSupportImpl implements MultiPlayerSupport {
 
 	@Override
 	public String checkForMessage(Player player) {
-		return "a new message";
+		return "a new message	";
 	}
 
 }
