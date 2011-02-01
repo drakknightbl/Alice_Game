@@ -27,12 +27,12 @@ public class MultiPlayerServerSupportImpl {
         if (Config.MY_PLAYER_TYPE == Config.CREATOR_PLAYER_TYPE) {
             player1.setName("Jake");
         } else { 
-            player1.setName("Baby Sitter");
+            player1.setName("My Tutor");
         }
 
         Player player2 = new Player();
         if (Config.MY_PLAYER_TYPE == Config.CREATOR_PLAYER_TYPE) {
-            player2.setName("Baby Sitter");
+            player2.setName("My Tutor");
         } else {
             player2.setName("Jake");
         }

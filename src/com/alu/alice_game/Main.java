@@ -52,7 +52,7 @@ public class Main extends Activity {
 	private boolean isSender; 
 
 	//Used to tell when both players have swapped once
-	private boolean swapped = true;
+	private boolean swapped = false;
 	
 	//Items
 	private Handler mHandler = new Handler();
@@ -75,10 +75,8 @@ public class Main extends Activity {
 	private MultiPlayerServerSupportImpl multiPlayerSupport;
 	// Player 1 always the user on the Phone
 	private Player player1;
-	private String player1Name = "Player 1";
 	//Player they are playing against
 	private Player player2;
-	private String player2Name = "Player 2";
 	private Player sendPlayer;
 	private Player receivePlayer ;
 	
@@ -135,6 +133,7 @@ public class Main extends Activity {
 		send_image_array.remove(0);
 		Animation move = AnimationUtils.loadAnimation(this, R.anim.z_move_1);
 		move.setAnimationListener(new sendAnimListener(this));
+		move.setZAdjustment(1);
 		image.startAnimation(move);
 		
 		Log.i("Main","startSendAnimation()");
@@ -177,6 +176,7 @@ public class Main extends Activity {
 		print_image_array.remove(0);
 		Animation move = AnimationUtils.loadAnimation(Main.this, R.anim.z_move);
 		move.setAnimationListener(new AnimListener());
+		move.setZAdjustment(1);
 		image.startAnimation(move);
 		
 		Log.i("Main","startAnimation : " + pim);
@@ -347,8 +347,9 @@ public class Main extends Activity {
                                                 //end current round
                                                 String continue_msg = "";
                                                 if(swapped){
-                                                        //continue_msg ="\nStarting Round " + (4 - numOfRounds);
-                                                        numOfRounds --;
+                                                	numOfRounds --;    
+                                                	continue_msg ="\nStarting Round " + (4 - numOfRounds);
+                                                        
                                                 }
                                                 if(numOfRounds == 0){
                                                                 continue_msg = "";
@@ -373,13 +374,14 @@ public class Main extends Activity {
                                         String continue_msg = "";
                                         //for receivePlayer set Flags
                                         if(swapped){ 
-                                                continue_msg ="\nStarting Round " + (4 - numOfRounds);
-                                                numOfRounds-- ;
+                                        	numOfRounds-- ;    
+                                        	continue_msg ="\nStarting Round " + (4 - numOfRounds);
+                                                
                                                 swapped = false;
                                         } else {
                                                 swapped = true; 
                                         }
-                                        Toast toast = Toast.makeText(getApplicationContext(), "Round Failed" + continue_msg, Toast.LENGTH_SHORT);
+                                        Toast toast = Toast.makeText(getApplicationContext(), "Round Ended" + continue_msg, Toast.LENGTH_SHORT);
                                         toast.setGravity(Gravity.CENTER, 0, -50);
                                         toast.show();
                                         // start next round
@@ -551,6 +553,7 @@ public class Main extends Activity {
 
 			if(swapped) { 
                             swapped = false;
+                            numOfRounds--;
                         } else { 
                             swapped = true; 
                         }
@@ -558,13 +561,25 @@ public class Main extends Activity {
             String sub = msg.substring(msg.length()-1, msg.length());
 			receivePlayer.setScore(Integer.parseInt(sub));
 			Integer iMessage= (receivePlayer.getScore() - oldscore);
-			String message = iMessage.toString();
+			String message = receivePlayer.getName() + " scored " + iMessage.toString() + " points.";
             Log.i("Main", "message swap : " + message + " old score : " + oldscore);
 			Toast score = Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT);
 			score.setGravity(Gravity.CENTER, 0, -50);
 			score.show();
+			String continue_msg = "";
+            if(swapped){
+            	numOfRounds --;    
+            	continue_msg ="\nStarting Round " + (4 - numOfRounds);
+                    
+            }
+            if(numOfRounds == 0){
+                            continue_msg = "";
+                    }
+            Toast nextround = Toast.makeText(getApplicationContext(), "Round Complete" + continue_msg, Toast.LENGTH_SHORT);
+            nextround.setGravity(Gravity.CENTER, 0, -50);
+            nextround.show();
 			this.switchRoles();
-		        this.startRound();	
+		    this.startRound();	
 		}
 		if(msg.equals("a new message")){
 			Log.i("Main", "readMessage - got new Message");
@@ -590,13 +605,24 @@ public class Main extends Activity {
 		if(numOfRounds == 0){
 			if(player1.getScore() > player2.getScore()){
 				//player1 WINS
+				Integer scoreDiff = player1.getScore() - player2.getScore();
+				Toast win = Toast.makeText(getApplicationContext(), player1.getName() + " won " + player2.getName() + " by " + scoreDiff + " points.", Toast.LENGTH_LONG);
+				win.setGravity(Gravity.CENTER, 0, -50);
+				win.show();
 				Log.i("Main", player1.getName() + " won " + player2.getName());
 			}else{
 				if(player1.getScore() == player2.getScore()){
 					//both players are tied
-					Log.i("Main", player1.getName() + " and " + player2.getName() + "tied");
+					Toast tied = Toast.makeText(getApplicationContext(), player1.getName() + " and " + player2.getName() + " has tied with a score of " + player1.getScore() + "points.",Toast.LENGTH_LONG);
+					tied.setGravity(Gravity.CENTER, 0, -50);
+					tied.show();
+					Log.i("Main", player1.getName() + " and " + player2.getName() + " tied");
 				}else{
 					//player1 lost
+					Integer scoreDiff = player2.getScore() - player1.getScore();
+					Toast lose = Toast.makeText(getApplicationContext(), player2.getName() + " won " + player1.getName() + " by " + scoreDiff + "points", Toast.LENGTH_LONG);
+					lose.setGravity(Gravity.CENTER, 0, -50);
+					lose.show();
 					Log.i("Main", player1.getName() + " lost to " + player2.getName());
 				}
 			}
@@ -609,7 +635,7 @@ public class Main extends Activity {
                                     button0.setVisibility(View.VISIBLE);
                                     button1.setVisibility(View.VISIBLE);
                                     button2.setVisibility(View.VISIBLE);
-                                    if((numOfRounds == 3) && swapped){
+                                    if((numOfRounds == 3) && !swapped){
                                     Toast round = Toast.makeText(getApplicationContext(), "Starting Round 1", Toast.LENGTH_SHORT);
                                     round.setGravity(Gravity.CENTER, 0, -50);
                                     round.show();
@@ -619,7 +645,7 @@ public class Main extends Activity {
                             greeting_instructions.show();
 				
 			} else {
-                            if((numOfRounds == 3) && swapped) {
+                            if((numOfRounds == 3) && !swapped) {
                             	
                                 Toast round = Toast.makeText(getApplicationContext(), "Starting Round 1", Toast.LENGTH_SHORT);
                                 round.setGravity(Gravity.CENTER, 0, -50);
@@ -748,11 +774,10 @@ public class Main extends Activity {
 					if(background_music.isPlaying()){
 						background_music.pause();
 						//unmute image
-						isSender =true;
 					}//if
 					else{
 						background_music.start();
-						isSender = false;
+						
 						//mute image
 					}//else
 				} catch(IllegalStateException e){

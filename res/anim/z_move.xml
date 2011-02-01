@@ -5,21 +5,21 @@
     <translate  android:fromXDelta="100%p" 
     		 	android:toXDelta="0" 
     		 	android:fromYDelta="0"
-    		 	android:toYDelta="20"
-    		 	android:duration="1000" /> 	
+    		 	android:toYDelta="40"
+    		 	android:duration="1000"/> 	
     		 	
-<!-- 
+
     <translate  android:startOffset="1000"
     			android:fromXDelta="0%p" 
     		 	android:toXDelta="256" 
-    		 	android:fromYDelta="20"
-    		 	android:toYDelta="40"
+    		 	android:fromYDelta="40"
+    		 	android:toYDelta="60"
     		 	android:duration="1000" />
     		 	
     <translate  android:startOffset="2000"
     			android:fromXDelta="0"
     		 	android:toXDelta="-256" 
-    		 	android:fromYDelta="40"
+    		 	android:fromYDelta="60"
     		 	android:toYDelta="80"
     		 	android:duration="1000" />
      
