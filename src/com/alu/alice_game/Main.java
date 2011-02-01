@@ -215,7 +215,7 @@ public class Main extends Activity {
 
 		@Override
 		public void onAnimationStart(Animation animation) {
-			
+			Log.i("Main", "AnimListener - Animation Start");
 		}
 		
 	}// AnimListener
@@ -578,7 +578,7 @@ public class Main extends Activity {
             multiPlayerSupport.checkForMessage(this, "command");
 		    Log.i("Main", "retrieve_image_array - Waiting for Retrieval");
 		    this.mHandler.removeCallbacks(tester);
-		    this.mHandler.postDelayed(tester, 1000);
+		    this.mHandler.postDelayed(tester, 10000);
 		}
 	}
 	
@@ -588,8 +588,11 @@ public class Main extends Activity {
 		public void run() {
 			// TODO Auto-generated method stub
 			Log.i("Main", "tester");
-			 print_image_array.add(new Integer(R.id.image1));
-			 Main.this.startAnimation();
+			//multiPlayerSupport.sendMessage("command" , receivePlayer, "plus=0;1;2;");
+			print_image_array.add(new Integer(R.id.image0));
+			image_1.setVisibility(View.VISIBLE);
+			Log.i("Main", "Image 1 is Visible Now");
+			Main.this.startAnimation();
 		}
 		
 		
