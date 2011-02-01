@@ -17,9 +17,8 @@ import org.apache.http.message.BasicNameValuePair;
 import android.content.Context;
 import android.util.Log;
 
-public class MultiPlayerServerSupportImpl implements MultiPlayerSupport {
+public class MultiPlayerServerSupportImpl {
 
-    @Override
     public Collection<Player> getOnlinePlayers() {
         Log.i("MultiPlayerServerSupportImpl", "getOnlinePlayers");
         Player player1 = new Player();
@@ -32,8 +31,6 @@ public class MultiPlayerServerSupportImpl implements MultiPlayerSupport {
         Player player2 = new Player();
         if (Config.MY_PLAYER_TYPE == Config.CREATOR_PLAYER_TYPE) {
             player2.setName("Baby Sitter");
-
-
         } else {
             player2.setName("Jake");
         }
@@ -48,22 +45,20 @@ public class MultiPlayerServerSupportImpl implements MultiPlayerSupport {
 
     }
 
-
-    @Override
-    public void sendMessage(Player player, String message) {
+    public void sendMessage(String type, Player player, String message) {
         Log.i("MultiPlayerServerSupportImpl", "Message \"" + message + "\" is sent to " + player.getName() + " ip 192.168.1.104:8084");
         HttpRequest hr = new HttpRequest();
         List<NameValuePair> nvp = new ArrayList<NameValuePair>(1);
         nvp.add(new BasicNameValuePair("message", message));
-        hr.post("http://192.168.1.104:8083/alice_creator", nvp);
+        hr.post("http://192.168.1.104:8084/alice_"+type, nvp);
          
     }
 
-    @Override
-    public void checkForMessage(Context ctx) {
+
+    public void checkForMessage(Context ctx, String type) {
         Log.i("MultiPlayerServerSupportImpl", "check for message");
         HttpRequest hr = new HttpRequest();
-        hr.get("http://192.168.1.104:8083/alice_creator", ctx); 
+        hr.get("http://192.168.1.104:8084/alice_"+type, ctx); 
     }
 
 }

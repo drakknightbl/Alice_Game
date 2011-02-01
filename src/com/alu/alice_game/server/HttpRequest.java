@@ -14,6 +14,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
 import android.content.Context;
+import android.os.Handler;
 import android.util.Log;
 
 import org.apache.http.client.methods.HttpGet;
@@ -72,16 +73,25 @@ public class HttpRequest {
         class HttpGetThread extends Thread {
             String sUrl;
             Context ctx;
+            private Handler mHandler;
 
             public HttpGetThread(String sUrl, Context ctx) {
                 this.sUrl = sUrl;
                 this.ctx = ctx;
+                this.mHandler = new Handler();
             }
+
+            private Runnable pollAgain = new Runnable() {
+                public void run() {
+                    HttpRequest hr = new HttpRequest();
+                    hr.get(HttpGetThread.this.sUrl, HttpGetThread.this.ctx);
+                }
+            };
 
             public void run() {
 
                 try {
-                	
+                    Log.i("HttpRequest", "get " + this.sUrl);
                     HttpClient hc = new DefaultHttpClient();
                     HttpGet get = new HttpGet(this.sUrl);
                     HttpResponse hr = hc.execute(get);
@@ -89,8 +99,13 @@ public class HttpRequest {
                     
                     if(he != null) {
                         String message = EntityUtils.toString(he);
-                        Main m = (Main) this.ctx;
-                        m.messageReceived(message);
+                        if(message.equals("")) { // poll
+                            this.mHandler.removeCallbacks(pollAgain);
+                            this.mHandler.postDelayed(pollAgain, 5000);
+                        } else { 
+                            Main m = (Main) this.ctx;
+                            m.messageReceived(message);
+                        }
                     } else {
                         Log.e("HttpRequest", this.sUrl + " return null");
                     }
