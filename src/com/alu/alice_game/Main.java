@@ -171,9 +171,9 @@ public class Main extends Activity {
 	
 	// starts the animation of three characters when receiving and destroys print_image_array
 	private void startAnimation(){
-		//ArrayList<Integer> image_array_copy = random_image_array;
-                int pim = print_image_array.get(0);
-		ImageView image = (ImageView) findViewById(R.id.image1);
+		
+        int pim = print_image_array.get(0);
+		ImageView image = (ImageView) findViewById(pim);
 		print_image_array.remove(0);
 		Animation move = AnimationUtils.loadAnimation(Main.this, R.anim.z_move);
 		move.setAnimationListener(new AnimListener());
@@ -340,7 +340,6 @@ public class Main extends Activity {
                                         button.setImageResource(inactive_image);
                                         //increase score
                                         receivePlayer.setScore(receivePlayer.getScore() + 1);
-                                        receivePlayer.updateScoreboard();
                                         //myScore.setText("Score:" + score);
                                         random_image_array.remove(0);
                                         Log.i("Main", "right");
@@ -357,10 +356,6 @@ public class Main extends Activity {
                                                 Toast nextround = Toast.makeText(getApplicationContext(), "Round Complete" + continue_msg, Toast.LENGTH_SHORT);
                                                 nextround.setGravity(Gravity.CENTER, 0, -50);
                                                 nextround.show();
-                                                        //update score
-                                                receivePlayer.updateScoreboard();
-                                                //myScore.setText("Score:" + score);
-                                                //for receivePlayer
                                                 if(swapped){ 
                                                         swapped = false;
                                                 } else {
@@ -530,7 +525,7 @@ public class Main extends Activity {
 	
 	private void readMessage(String msg){
 		String key = msg.substring(0, 5);
-		Log.i("Main", "readMessage-Key: " + key);
+		Log.i("Main", "readMessage-Key: '" + key + "' message : '" + msg + "'");
 		if(key.equals("plus=")){
 			String order = msg.substring(5);
 			Log.i("Main", "readMessage-order " + order);
@@ -547,15 +542,23 @@ public class Main extends Activity {
 			this.startAnimation();
 		}
 		if(key.equals("swap=")){
-			if(swapped){ swapped = false;}
-			else { swapped = true; }
-			int oldscore = receivePlayer.getScore();
-			receivePlayer.setScore(Integer.parseInt( msg.substring(5, msg.length() - 1 )));
-			Toast score = Toast.makeText(getApplicationContext(), receivePlayer.getScore() - oldscore, Toast.LENGTH_SHORT);
+
+			if(swapped) { 
+                            swapped = false;
+                        } else { 
+                            swapped = true; 
+                        }
+			Integer oldscore = receivePlayer.getScore();
+            String sub = msg.substring(msg.length()-1, msg.length());
+			receivePlayer.setScore(Integer.parseInt(sub));
+			Integer iMessage= (receivePlayer.getScore() - oldscore);
+			String message = iMessage.toString();
+            Log.i("Main", "message swap : " + message + " old score : " + oldscore);
+			Toast score = Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT);
 			score.setGravity(Gravity.CENTER, 0, -50);
 			score.show();
 			this.switchRoles();
-			
+		        this.startRound();	
 		}
 		if(msg.equals("a new message")){
 			Log.i("Main", "readMessage - got new Message");
@@ -570,26 +573,12 @@ public class Main extends Activity {
 		if (print_image_array.size() == 3){
 		    this.startAnimation();
 		} else {
-			//try to get message from server
+		    //try to get message from server
             multiPlayerSupport.checkForMessage(this, "command");
 		    Log.i("Main", "retrieve_image_array - Waiting for Retrieval");
-		    this.mHandler.removeCallbacks(tester);
-		    this.mHandler.postDelayed(tester, 1000);
 		}
 	}
 	
-	private Runnable tester = new Runnable() {
-
-		@Override
-		public void run() {
-			// TODO Auto-generated method stub
-			Log.i("Main", "tester");
-			 print_image_array.add(new Integer(R.id.image1));
-			 Main.this.startAnimation();
-		}
-		
-		
-	};
 	
 	private void startRound(){
 		if(numOfRounds == 0){
@@ -625,9 +614,11 @@ public class Main extends Activity {
 				
 			} else {
                             if((numOfRounds == 3) && swapped) {
+                            	
                                 Toast round = Toast.makeText(getApplicationContext(), "Starting Round 1", Toast.LENGTH_SHORT);
                                 round.setGravity(Gravity.CENTER, 0, -50);
                                 round.show();
+                                
                             }// if
                             this.retrieve_image_array();
                             Log.i("Main", "startRound - isReceiver");
@@ -690,12 +681,10 @@ public class Main extends Activity {
         inGamePlayers = players.toArray();
         //UI Items
         player1 = (Player) inGamePlayers[0];
-        player1.scoreboard = (TextView) findViewById(R.id.score_text1);
-        player1.updateScoreboard();
+        player1.setScoreBoard((TextView) findViewById(R.id.score_text1));
         //p1Score.setText(Player1.getName() + ": " + Player1.getScore());
         player2 = (Player) inGamePlayers[1];
-        player2.scoreboard = (TextView) findViewById(R.id.score_text2);
-        player2.updateScoreboard();
+        player2.setScoreBoard((TextView) findViewById(R.id.score_text2));
         //p2Score.setText(Player2.getName() + ": " + Player2.getScore());
         if(isSender){
         	sendPlayer = player1;
