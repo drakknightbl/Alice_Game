@@ -501,7 +501,12 @@ public class Main extends Activity {
 		Player temp = sendPlayer;
 		sendPlayer= receivePlayer;
 		receivePlayer = temp;
-		
+
+                if(isSender==true) {
+        	    isSender = false;	
+                } else {
+                    isSender = true;
+                }
 	}
 	
 	private void sendSequence(){
