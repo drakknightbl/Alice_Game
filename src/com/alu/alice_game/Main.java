@@ -654,6 +654,10 @@ public class Main extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
+        
+        
+        
         Intent i = getIntent();
         int from_mwc = i.getIntExtra("from_mwc", 0);
         Log.i("Main", "from_mwc : " + from_mwc);
@@ -670,14 +674,7 @@ public class Main extends Activity {
             isSender = false;
         }
         
-        // create base set of image id
-        
-        setContentView(R.layout.main);
-        //Initialization
-        
-        //Used to delay Actions for testing
-        mHandler.removeCallbacks(TimeDelay);
-        mHandler.postDelayed(TimeDelay, 5000);
+
 
         inverted_image_map.put(new Integer(R.id.image0), "0");
         inverted_image_map.put(new Integer(R.id.image1), "1");
@@ -707,6 +704,8 @@ public class Main extends Activity {
         	sendPlayer = player2;
         	receivePlayer =player1;
         }
+        
+        
         image_0 = (ImageView) findViewById(R.id.image0);
         image_1 = (ImageView) findViewById(R.id.image1);
         image_2 = (ImageView) findViewById(R.id.image2);
@@ -714,19 +713,23 @@ public class Main extends Activity {
         button0 = (ImageButton) findViewById(R.id.button0);
         button1 = (ImageButton) findViewById(R.id.button1);
         button2 = (ImageButton) findViewById(R.id.button2);
+        
+        
         playAgainBtn = (ImageButton) findViewById(R.id.play_again_img);
         playAgainBtn.setClickable(false);
         tryAgainBtn = (ImageButton) findViewById(R.id.try_again_img);
         tryAgainBtn.setClickable(false);
         // hide images
+        /*
         image_0.setVisibility(View.INVISIBLE);
         image_1.setVisibility(View.INVISIBLE);
         image_2.setVisibility(View.INVISIBLE);
+        */
         // hide buttons
 		button0.setVisibility(View.INVISIBLE);
 		button1.setVisibility(View.INVISIBLE);
 		button2.setVisibility(View.INVISIBLE);
-
+	    
 		
 		background_music = MediaPlayer.create(getApplicationContext(), R.raw.freeze_ray);
 		background_music.setLooping(true);
@@ -734,7 +737,7 @@ public class Main extends Activity {
         
 		//starts game here
 		this.startRound();
-		//this.gameSetUpPerRound();
+		
         
         playAgainBtn.setOnClickListener(new myPlayAgainClickListener(this));
         tryAgainBtn.setOnClickListener(new myPlayAgainClickListener(this));
@@ -776,7 +779,7 @@ public class Main extends Activity {
 		    	
         Log.i("Main", "onCreate");
 
-        startGetCredentials();
+        //startGetCredentials();
 
     }// onCreate
    
@@ -816,6 +819,7 @@ public class Main extends Activity {
     
     public void onPause() {
     	Log.i("Main", "onPause");
+    	this.multiPlayerSupport.onFinish();
     	this.finish();
     	super.onPause();
     }

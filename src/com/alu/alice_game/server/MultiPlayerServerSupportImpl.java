@@ -18,7 +18,9 @@ import android.content.Context;
 import android.util.Log;
 
 public class MultiPlayerServerSupportImpl {
-
+	
+	private HttpRequest hr = new HttpRequest();
+	
     public Collection<Player> getOnlinePlayers() {
         Log.i("MultiPlayerServerSupportImpl", "getOnlinePlayers");
         Player player1 = new Player();
@@ -47,18 +49,24 @@ public class MultiPlayerServerSupportImpl {
 
     public void sendMessage(String type, Player player, String message) {
         Log.i("MultiPlayerServerSupportImpl", "Message \"" + message + "\" is sent to " + player.getName() + " ip 192.168.1.104:8084");
-        HttpRequest hr = new HttpRequest();
+        
         List<NameValuePair> nvp = new ArrayList<NameValuePair>(1);
         nvp.add(new BasicNameValuePair("message", message));
-        hr.post("http://192.168.1.104:8084/alice_"+type, nvp);
+        this.hr.post("http://192.168.1.104:8084/alice_"+type, nvp);
          
     }
 
 
     public void checkForMessage(Context ctx, String type) {
         Log.i("MultiPlayerServerSupportImpl", "check for message");
-        HttpRequest hr = new HttpRequest();
-        hr.get("http://192.168.1.104:8084/alice_"+type, ctx); 
+        
+        this.hr.get("http://192.168.1.104:8084/alice_"+type, ctx); 
     }
+
+    
+	public void onFinish() {
+		Log.i("MultiPlayerServerSupportImpl", "finalize");
+		hr.onFinish();
+	}
 
 }
