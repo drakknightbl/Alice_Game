@@ -17,6 +17,7 @@ import com.amazonaws.auth.BasicAWSCredentials;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
@@ -89,12 +90,7 @@ public class Main extends Activity {
                 //multiPlayerSupport =  new MultiPlayerAwsSupportImpl(player1Name, player2Name);
 
                 // Server side (instead of amazon for now)
-                multiPlayerSupport = new MultiPlayerServerSupportImpl();
-                if(Config.MY_PLAYER_TYPE==Config.CREATOR_PLAYER_TYPE) {
-                    isSender = true;
-                } else {
-                    isSender = false;
-                }
+                
 	}
 	
 	// Used to make a timer
@@ -658,6 +654,21 @@ public class Main extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Intent i = getIntent();
+        int from_mwc = i.getIntExtra("from_mwc", 0);
+        Log.i("Main", "from_mwc : " + from_mwc);
+        if(from_mwc==1) {
+        	Config.MY_PLAYER_TYPE = Config.CREATOR_PLAYER_TYPE;
+        } else {
+        	Config.MY_PLAYER_TYPE = Config.GUEST_PLAYER_TYPE;
+        }
+         
+        multiPlayerSupport = new MultiPlayerServerSupportImpl();
+        if(Config.MY_PLAYER_TYPE==Config.CREATOR_PLAYER_TYPE) {
+            isSender = true;
+        } else {
+            isSender = false;
+        }
         
         // create base set of image id
         

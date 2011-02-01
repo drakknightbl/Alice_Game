@@ -13,9 +13,10 @@
             </intent-filter>
             
             <intent-filter>
-             <action android:name="com.alu.Launched.LaunchedMain" />
-             <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="com.alu.alice_game.Main" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
      	</activity>
 
     </application>
