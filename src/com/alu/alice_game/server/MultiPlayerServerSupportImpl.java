@@ -52,7 +52,7 @@ public class MultiPlayerServerSupportImpl {
         
         List<NameValuePair> nvp = new ArrayList<NameValuePair>(1);
         nvp.add(new BasicNameValuePair("message", message));
-        this.hr.post("http://192.168.1.104:8084/alice_"+type, nvp);
+        this.hr.post("http://cf.conversationboard.com/alice_"+type, nvp);
          
     }
 
@@ -60,7 +60,7 @@ public class MultiPlayerServerSupportImpl {
     public void checkForMessage(Context ctx, String type) {
         Log.i("MultiPlayerServerSupportImpl", "check for message");
         
-        this.hr.get("http://192.168.1.104:8084/alice_"+type, ctx); 
+        this.hr.get("http://cf.conversationboard.com/alice_"+type, ctx); 
     }
 
     

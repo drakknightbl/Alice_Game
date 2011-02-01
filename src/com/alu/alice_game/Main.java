@@ -361,14 +361,14 @@ public class Main extends Activity {
                                                 } else {
                                                         swapped = true; 
                                                 }
-                                                m.isSender = true;
                                                 // start next round
                                                 m.reset_button();
                                                 m.multiPlayerSupport.sendMessage("result", sendPlayer, "swap=" + receivePlayer.getScore());
                                                 m.switchRoles();
                                                 m.startRound();
                                         }
-                                    } else {
+                                    } else { // round failed
+
                                         // display new scores
                                         String continue_msg = "";
                                         //for receivePlayer set Flags
@@ -382,7 +382,6 @@ public class Main extends Activity {
                                         Toast toast = Toast.makeText(getApplicationContext(), "Round Failed" + continue_msg, Toast.LENGTH_SHORT);
                                         toast.setGravity(Gravity.CENTER, 0, -50);
                                         toast.show();
-                                        m.isSender = true;
                                         // start next round
                                         m.reset_button();
                                         m.multiPlayerSupport.sendMessage("result", sendPlayer, "swap=" + receivePlayer.getScore());
@@ -503,8 +502,10 @@ public class Main extends Activity {
 		receivePlayer = temp;
 
                 if(isSender==true) {
+                    Log.i("Main", "switch roles to receiver");
         	    isSender = false;	
                 } else {
+                    Log.i("Main", "switch roles to sender");
                     isSender = true;
                 }
 	}
