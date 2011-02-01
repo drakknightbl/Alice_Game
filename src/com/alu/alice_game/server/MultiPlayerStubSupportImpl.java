@@ -3,6 +3,9 @@ package com.alu.alice_game.server;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import android.content.Context;
+import android.util.Log;
+
 import com.alu.alice_game.domain.Player;
 
 public class MultiPlayerStubSupportImpl implements MultiPlayerSupport {
@@ -29,8 +32,8 @@ public class MultiPlayerStubSupportImpl implements MultiPlayerSupport {
 	}
 
 	@Override
-	public String checkForMessage(Player player) {
-		return "a new message	";
+	public void checkForMessage(Context ctx) {
+		Log.i("MultiPlayerStubbSupp", "message");
 	}
 
 }

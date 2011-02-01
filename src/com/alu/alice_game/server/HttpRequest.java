@@ -3,6 +3,7 @@ package com.alu.alice_game.server;
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
@@ -12,9 +13,13 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
+import android.content.Context;
 import android.util.Log;
 
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.util.EntityUtils;
 
+import com.alu.alice_game.Main;
 
 public class HttpRequest {
     
@@ -27,15 +32,21 @@ public class HttpRequest {
         * @return
         */
         public void post(String sUrl, List<NameValuePair>nameValuePairs) {
-                HttpThread ht = new HttpThread(sUrl, nameValuePairs);
+                HttpPostThread ht = new HttpPostThread(sUrl, nameValuePairs);
                 ht.run();
         }
+
+
+        public void get(String sUrl, Context ctx) {
+            HttpGetThread ht = new HttpGetThread(sUrl, ctx);
+            ht.run();
+        }
         
-        class HttpThread extends Thread {
+        class HttpPostThread extends Thread {
         	String sUrl;
         	List<NameValuePair> params;
         	
-        	public HttpThread(String sUrl, List<NameValuePair>nameValuePairs) {
+        	public HttpPostThread(String sUrl, List<NameValuePair>nameValuePairs) {
                     this.sUrl = sUrl;
                     this.params = nameValuePairs;
         	}
@@ -56,6 +67,42 @@ public class HttpRequest {
                     }
 
                 }
+        }
+
+        class HttpGetThread extends Thread {
+            String sUrl;
+            Context ctx;
+
+            public HttpGetThread(String sUrl, Context ctx) {
+                this.sUrl = sUrl;
+                this.ctx = ctx;
+            }
+
+            public void run() {
+
+                try {
+                	
+                    HttpClient hc = new DefaultHttpClient();
+                    HttpGet get = new HttpGet(this.sUrl);
+                    HttpResponse hr = hc.execute(get);
+                    HttpEntity he = hr.getEntity();
+                    
+                    if(he != null) {
+                        String message = EntityUtils.toString(he);
+                        Main m = (Main) this.ctx;
+                        m.messageReceived(message);
+                    } else {
+                        Log.e("HttpRequest", this.sUrl + " return null");
+                    }
+                } catch(Exception e) {
+                    e.printStackTrace();
+                }
+
+
+
+            }
+
+
         }
         
 }

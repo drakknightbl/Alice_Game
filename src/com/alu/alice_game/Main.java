@@ -531,14 +531,17 @@ public class Main extends Activity {
 		this.startSendAnimation();
 		// Send random_image_array to Receiver's queue
 		String msg ="";
-		while(msg.equals("")){
-			msg = multiPlayerSupport.checkForMessage(receivePlayer);
-		}
+		
+		multiPlayerSupport.checkForMessage(this);
+		
 		//this.readMessage(msg);
 		Log.i("Main", "sendSequence");
 		
 	}//sendSequence
-	
+
+        public void messageReceived(String msg) {
+            Log.i("Main", "message recieved : " + msg);
+        }
 	
 	private void readMessage(String msg){
 		String key = msg.substring(0, 5);
@@ -579,11 +582,10 @@ public class Main extends Activity {
 		String msg = "";
 		if (print_image_array.size() == 3){
 				this.startAnimation();
-		}else{
+		} else{
 			//try to get message from server
-			while(msg.equals("")){
-			msg = multiPlayerSupport.checkForMessage(receivePlayer);
-		}
+			multiPlayerSupport.checkForMessage(this);
+			
 		//this.readMessage(msg);
 		// hard coded for testing
 			

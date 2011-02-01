@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import android.content.Context;
+import android.util.Log;
+
 import com.alu.alice_game.domain.Player;
 import com.alu.alice_game.server.SimpleQueue;
 import java.lang.String;
@@ -76,9 +79,9 @@ public class MultiPlayerAwsSupportImpl implements MultiPlayerSupport {
 	}
 
 	@Override
-	public String checkForMessage(Player player) {
+	public void checkForMessage(Context ctx) {
 		
-		return null;
+		Log.i("MutliPLayerAwsSupport", "message");
 	}
 
 }

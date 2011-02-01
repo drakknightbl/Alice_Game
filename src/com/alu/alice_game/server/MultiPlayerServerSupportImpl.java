@@ -14,6 +14,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 
 
+import android.content.Context;
 import android.util.Log;
 
 public class MultiPlayerServerSupportImpl implements MultiPlayerSupport {
@@ -59,8 +60,10 @@ public class MultiPlayerServerSupportImpl implements MultiPlayerSupport {
     }
 
     @Override
-    public String checkForMessage(Player player) {
-            Log.i("MultiPlayerServerSupportImpl", "check for message");
+    public void checkForMessage(Context ctx) {
+        Log.i("MultiPlayerServerSupportImpl", "check for message");
+        HttpRequest hr = new HttpRequest();
+        hr.get("http://192.168.1.104:8083/alice_creator", ctx); 
     }
 
 }

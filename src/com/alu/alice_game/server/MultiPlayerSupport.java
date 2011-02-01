@@ -2,6 +2,8 @@ package com.alu.alice_game.server;
 
 import java.util.Collection;
 
+import android.content.Context;
+
 import com.alu.alice_game.domain.Player;
 
 public interface MultiPlayerSupport {
@@ -29,6 +31,6 @@ public interface MultiPlayerSupport {
 	 * @param player - player
 	 * @return message if available, o/w null
 	 */
-	public String checkForMessage(Player player);
+	public void checkForMessage(Context ctx);
 
 }
