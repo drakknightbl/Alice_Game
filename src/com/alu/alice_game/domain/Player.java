@@ -46,12 +46,19 @@ public class Player implements Serializable {
 	
 	public void setScore (int n){
 		score =n;
+                this.updateScoreboard();
 	}
 	//resets score of the player to 0
 	public void resetScore(){
 		score = 0;
 		this.updateScoreboard();
 	}
+
+        public void setScoreBoard(TextView scoreboard) {
+            this.scoreboard = scoreboard;
+            this.resetScore();
+        }
+
 	// Updates the score on the screen
 	public void updateScoreboard(){
 		scoreboard.setText(name + ": " + score );

@@ -23,7 +23,8 @@ import org.apache.http.util.EntityUtils;
 import com.alu.alice_game.Main;
 
 public class HttpRequest {
-    
+    	HttpPostThread htp;
+    	HttpGetThread htg;
 
         /**
         * Post request (upload files)
@@ -33,14 +34,16 @@ public class HttpRequest {
         * @return
         */
         public void post(String sUrl, List<NameValuePair>nameValuePairs) {
-                HttpPostThread ht = new HttpPostThread(sUrl, nameValuePairs);
-                ht.run();
+                this.htp = new HttpPostThread(sUrl, nameValuePairs);
+                this.htp.run();
         }
 
+        
+        
 
         public void get(String sUrl, Context ctx) {
-            HttpGetThread ht = new HttpGetThread(sUrl, ctx);
-            ht.run();
+            this.htg = new HttpGetThread(sUrl, ctx);
+            this.htg.run();
         }
         
         class HttpPostThread extends Thread {
@@ -67,8 +70,16 @@ public class HttpRequest {
 
                     }
 
-                }
+             }
+        	
+        	
         }
+        
+        public void onFinish() {
+    		if(this.htg!=null){
+    			this.htg.onFinish();
+    		}
+    	}
 
         class HttpGetThread extends Thread {
             String sUrl;
@@ -83,10 +94,14 @@ public class HttpRequest {
 
             private Runnable pollAgain = new Runnable() {
                 public void run() {
-                    HttpRequest hr = new HttpRequest();
-                    hr.get(HttpGetThread.this.sUrl, HttpGetThread.this.ctx);
+                	HttpRequest.this.get(HttpGetThread.this.sUrl, HttpGetThread.this.ctx);
                 }
             };
+            
+            public void onFinish() {
+            	Log.i("HttpRequest", "onFinish");
+            	this.mHandler.removeCallbacks(pollAgain);
+            }
 
             public void run() {
 
@@ -112,8 +127,6 @@ public class HttpRequest {
                 } catch(Exception e) {
                     e.printStackTrace();
                 }
-
-
 
             }
 

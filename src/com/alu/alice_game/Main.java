@@ -17,6 +17,7 @@ import com.amazonaws.auth.BasicAWSCredentials;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
@@ -89,12 +90,7 @@ public class Main extends Activity {
                 //multiPlayerSupport =  new MultiPlayerAwsSupportImpl(player1Name, player2Name);
 
                 // Server side (instead of amazon for now)
-                multiPlayerSupport = new MultiPlayerServerSupportImpl();
-                if(Config.MY_PLAYER_TYPE==Config.CREATOR_PLAYER_TYPE) {
-                    isSender = true;
-                } else {
-                    isSender = false;
-                }
+                
 	}
 	
 	// Used to make a timer
@@ -175,9 +171,9 @@ public class Main extends Activity {
 	
 	// starts the animation of three characters when receiving and destroys print_image_array
 	private void startAnimation(){
-		//ArrayList<Integer> image_array_copy = random_image_array;
-                int pim = print_image_array.get(0);
-		ImageView image = (ImageView) findViewById(R.id.image1);
+		
+        int pim = print_image_array.get(0);
+		ImageView image = (ImageView) findViewById(pim);
 		print_image_array.remove(0);
 		Animation move = AnimationUtils.loadAnimation(Main.this, R.anim.z_move);
 		move.setAnimationListener(new AnimListener());
@@ -344,7 +340,6 @@ public class Main extends Activity {
                                         button.setImageResource(inactive_image);
                                         //increase score
                                         receivePlayer.setScore(receivePlayer.getScore() + 1);
-                                        receivePlayer.updateScoreboard();
                                         //myScore.setText("Score:" + score);
                                         random_image_array.remove(0);
                                         Log.i("Main", "right");
@@ -361,23 +356,19 @@ public class Main extends Activity {
                                                 Toast nextround = Toast.makeText(getApplicationContext(), "Round Complete" + continue_msg, Toast.LENGTH_SHORT);
                                                 nextround.setGravity(Gravity.CENTER, 0, -50);
                                                 nextround.show();
-                                                        //update score
-                                                receivePlayer.updateScoreboard();
-                                                //myScore.setText("Score:" + score);
-                                                //for receivePlayer
                                                 if(swapped){ 
                                                         swapped = false;
                                                 } else {
                                                         swapped = true; 
                                                 }
-                                                m.isSender = true;
                                                 // start next round
                                                 m.reset_button();
                                                 m.multiPlayerSupport.sendMessage("result", sendPlayer, "swap=" + receivePlayer.getScore());
                                                 m.switchRoles();
                                                 m.startRound();
                                         }
-                                    } else {
+                                    } else { // round failed
+
                                         // display new scores
                                         String continue_msg = "";
                                         //for receivePlayer set Flags
@@ -391,7 +382,6 @@ public class Main extends Activity {
                                         Toast toast = Toast.makeText(getApplicationContext(), "Round Failed" + continue_msg, Toast.LENGTH_SHORT);
                                         toast.setGravity(Gravity.CENTER, 0, -50);
                                         toast.show();
-                                        m.isSender = true;
                                         // start next round
                                         m.reset_button();
                                         m.multiPlayerSupport.sendMessage("result", sendPlayer, "swap=" + receivePlayer.getScore());
@@ -510,7 +500,14 @@ public class Main extends Activity {
 		Player temp = sendPlayer;
 		sendPlayer= receivePlayer;
 		receivePlayer = temp;
-		
+
+                if(isSender==true) {
+                    Log.i("Main", "switch roles to receiver");
+        	    isSender = false;	
+                } else {
+                    Log.i("Main", "switch roles to sender");
+                    isSender = true;
+                }
 	}
 	
 	private void sendSequence(){
@@ -534,7 +531,7 @@ public class Main extends Activity {
 	
 	private void readMessage(String msg){
 		String key = msg.substring(0, 5);
-		Log.i("Main", "readMessage-Key: " + key);
+		Log.i("Main", "readMessage-Key: '" + key + "' message : '" + msg + "'");
 		if(key.equals("plus=")){
 			String order = msg.substring(5);
 			Log.i("Main", "readMessage-order " + order);
@@ -551,15 +548,23 @@ public class Main extends Activity {
 			this.startAnimation();
 		}
 		if(key.equals("swap=")){
-			if(swapped){ swapped = false;}
-			else { swapped = true; }
-			int oldscore = receivePlayer.getScore();
-			receivePlayer.setScore(Integer.parseInt( msg.substring(5, msg.length() - 1 )));
-			Toast score = Toast.makeText(getApplicationContext(), receivePlayer.getScore() - oldscore, Toast.LENGTH_SHORT);
+
+			if(swapped) { 
+                            swapped = false;
+                        } else { 
+                            swapped = true; 
+                        }
+			Integer oldscore = receivePlayer.getScore();
+            String sub = msg.substring(msg.length()-1, msg.length());
+			receivePlayer.setScore(Integer.parseInt(sub));
+			Integer iMessage= (receivePlayer.getScore() - oldscore);
+			String message = iMessage.toString();
+            Log.i("Main", "message swap : " + message + " old score : " + oldscore);
+			Toast score = Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT);
 			score.setGravity(Gravity.CENTER, 0, -50);
 			score.show();
 			this.switchRoles();
-			
+		        this.startRound();	
 		}
 		if(msg.equals("a new message")){
 			Log.i("Main", "readMessage - got new Message");
@@ -574,29 +579,12 @@ public class Main extends Activity {
 		if (print_image_array.size() == 3){
 		    this.startAnimation();
 		} else {
-			//try to get message from server
+		    //try to get message from server
             multiPlayerSupport.checkForMessage(this, "command");
 		    Log.i("Main", "retrieve_image_array - Waiting for Retrieval");
-		    this.mHandler.removeCallbacks(tester);
-		    this.mHandler.postDelayed(tester, 10000);
 		}
 	}
 	
-	private Runnable tester = new Runnable() {
-
-		@Override
-		public void run() {
-			// TODO Auto-generated method stub
-			Log.i("Main", "tester");
-			//multiPlayerSupport.sendMessage("command" , receivePlayer, "plus=0;1;2;");
-			print_image_array.add(new Integer(R.id.image0));
-			image_1.setVisibility(View.VISIBLE);
-			Log.i("Main", "Image 1 is Visible Now");
-			Main.this.startAnimation();
-		}
-		
-		
-	};
 	
 	private void startRound(){
 		if(numOfRounds == 0){
@@ -632,9 +620,11 @@ public class Main extends Activity {
 				
 			} else {
                             if((numOfRounds == 3) && swapped) {
+                            	
                                 Toast round = Toast.makeText(getApplicationContext(), "Starting Round 1", Toast.LENGTH_SHORT);
                                 round.setGravity(Gravity.CENTER, 0, -50);
                                 round.show();
+                                
                             }// if
                             this.retrieve_image_array();
                             Log.i("Main", "startRound - isReceiver");
@@ -661,15 +651,27 @@ public class Main extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
-        // create base set of image id
-        
         setContentView(R.layout.main);
-        //Initialization
         
-        //Used to delay Actions for testing
-        mHandler.removeCallbacks(TimeDelay);
-        mHandler.postDelayed(TimeDelay, 5000);
+        
+        
+        Intent i = getIntent();
+        int from_mwc = i.getIntExtra("from_mwc", 0);
+        Log.i("Main", "from_mwc : " + from_mwc);
+        if(from_mwc==1) {
+        	Config.MY_PLAYER_TYPE = Config.CREATOR_PLAYER_TYPE;
+        } else {
+        	Config.MY_PLAYER_TYPE = Config.GUEST_PLAYER_TYPE;
+        }
+         
+        multiPlayerSupport = new MultiPlayerServerSupportImpl();
+        if(Config.MY_PLAYER_TYPE==Config.CREATOR_PLAYER_TYPE) {
+            isSender = true;
+        } else {
+            isSender = false;
+        }
+        
+
 
         inverted_image_map.put(new Integer(R.id.image0), "0");
         inverted_image_map.put(new Integer(R.id.image1), "1");
@@ -685,12 +687,10 @@ public class Main extends Activity {
         inGamePlayers = players.toArray();
         //UI Items
         player1 = (Player) inGamePlayers[0];
-        player1.scoreboard = (TextView) findViewById(R.id.score_text1);
-        player1.updateScoreboard();
+        player1.setScoreBoard((TextView) findViewById(R.id.score_text1));
         //p1Score.setText(Player1.getName() + ": " + Player1.getScore());
         player2 = (Player) inGamePlayers[1];
-        player2.scoreboard = (TextView) findViewById(R.id.score_text2);
-        player2.updateScoreboard();
+        player2.setScoreBoard((TextView) findViewById(R.id.score_text2));
         //p2Score.setText(Player2.getName() + ": " + Player2.getScore());
         if(isSender){
         	sendPlayer = player1;
@@ -699,6 +699,8 @@ public class Main extends Activity {
         	sendPlayer = player2;
         	receivePlayer =player1;
         }
+        
+        
         image_0 = (ImageView) findViewById(R.id.image0);
         image_1 = (ImageView) findViewById(R.id.image1);
         image_2 = (ImageView) findViewById(R.id.image2);
@@ -706,19 +708,23 @@ public class Main extends Activity {
         button0 = (ImageButton) findViewById(R.id.button0);
         button1 = (ImageButton) findViewById(R.id.button1);
         button2 = (ImageButton) findViewById(R.id.button2);
+        
+        
         playAgainBtn = (ImageButton) findViewById(R.id.play_again_img);
         playAgainBtn.setClickable(false);
         tryAgainBtn = (ImageButton) findViewById(R.id.try_again_img);
         tryAgainBtn.setClickable(false);
         // hide images
+        /*
         image_0.setVisibility(View.INVISIBLE);
         image_1.setVisibility(View.INVISIBLE);
         image_2.setVisibility(View.INVISIBLE);
+        */
         // hide buttons
 		button0.setVisibility(View.INVISIBLE);
 		button1.setVisibility(View.INVISIBLE);
 		button2.setVisibility(View.INVISIBLE);
-
+	    
 		
 		background_music = MediaPlayer.create(getApplicationContext(), R.raw.freeze_ray);
 		background_music.setLooping(true);
@@ -726,7 +732,7 @@ public class Main extends Activity {
         
 		//starts game here
 		this.startRound();
-		//this.gameSetUpPerRound();
+		
         
         playAgainBtn.setOnClickListener(new myPlayAgainClickListener(this));
         tryAgainBtn.setOnClickListener(new myPlayAgainClickListener(this));
@@ -768,7 +774,7 @@ public class Main extends Activity {
 		    	
         Log.i("Main", "onCreate");
 
-        startGetCredentials();
+        //startGetCredentials();
 
     }// onCreate
    
@@ -808,6 +814,7 @@ public class Main extends Activity {
     
     public void onPause() {
     	Log.i("Main", "onPause");
+    	this.multiPlayerSupport.onFinish();
     	this.finish();
     	super.onPause();
     }
