@@ -24,6 +24,9 @@ public class Player implements Serializable {
 	//Queue URL of Player
 	private String queueURL;
 
+	//ALUM number Account
+	private String alumNumber;
+	
 	public Player(){
 		this("John Doe");
 	}
@@ -69,6 +72,14 @@ public class Player implements Serializable {
 	}
 	public void setURL(String url){
 		queueURL = url;
+	}
+	
+	public String getNumber(){
+		return alumNumber;
+	}
+	
+	public void setNumber(String number){
+		alumNumber = number;
 	}
 
 }

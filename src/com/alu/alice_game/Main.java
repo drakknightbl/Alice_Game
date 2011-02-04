@@ -599,6 +599,26 @@ public class Main extends Activity {
 		    Log.i("Main", "retrieve_image_array - Waiting for Retrieval");
 		}
 	}
+	// The last sender gets to Call the other Player, by firing an intent to trigger ALUM
+	// @param player Player to be called
+	private void callPlayer(Player player){
+		// Call Other Player
+		Intent callIntent = new Intent();
+
+        callIntent.setAction("com.android.phone.InCallScreen.ATV_VIDEO_CALL");
+
+        Bundle extras = new Bundle();
+
+        extras.putString("phone", player.getNumber());
+
+        extras.putString("name", player.getName());
+
+        extras.putString("label", "...");
+
+        callIntent.putExtras(extras);
+
+        sendBroadcast(callIntent);
+	}
 	
 	
 	private void startRound(){
@@ -626,24 +646,11 @@ public class Main extends Activity {
 					Log.i("Main", player1.getName() + " lost to " + player2.getName());
 				}
 			}
-			/*
-			// Call Other Player
-			Intent callIntent = new Intent();
-
-            callIntent.setAction("com.android.phone.InCallScreen.ATV_VIDEO_CALL");
-
-            Bundle extras = new Bundle();
-
-            extras.putString("phone", alum.getNumber());
-
-            extras.putString("name", player2.getName());
-
-            extras.putString("label", "...");
-
-            callIntent.putExtras(extras);
-
-            sendBroadcast(callIntent);
-            */
+			// Make Call
+			if(isSender){
+				this.callPlayer(player2);
+			}
+            
 			
 		}else{
                         image_array.add( new Integer(R.id.image0));
@@ -730,12 +737,24 @@ public class Main extends Activity {
         Object [] inGamePlayers;
         inGamePlayers = players.toArray();
         //UI Items
+        //Player 1 Setup
         player1 = (Player) inGamePlayers[0];
         player1.setScoreBoard((TextView) findViewById(R.id.score_text1));
+        String player1Name = i.getStringExtra("first_player");
+        player1.setName(player1Name);
+        String player1Number = i.getStringExtra("first_number");
+        player1.setNumber(player1Number);
         //p1Score.setText(Player1.getName() + ": " + Player1.getScore());
+        //Player 2 Setup
         player2 = (Player) inGamePlayers[1];
         player2.setScoreBoard((TextView) findViewById(R.id.score_text2));
+        String player2Name = i.getStringExtra("second_player");
+        player2.setName(player2Name);
+        String player2Number = i.getStringExtra("second_number");
+        player2.setNumber(player2Number);
         //p2Score.setText(Player2.getName() + ": " + Player2.getScore());
+
+        
         if(isSender){
         	sendPlayer = player1;
         	receivePlayer = player2;

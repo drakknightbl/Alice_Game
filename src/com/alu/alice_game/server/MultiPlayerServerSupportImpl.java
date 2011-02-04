@@ -25,6 +25,9 @@ public class MultiPlayerServerSupportImpl {
         Log.i("MultiPlayerServerSupportImpl", "getOnlinePlayers");
         Player player1 = new Player();
         Player player2 = new Player();
+        player1.setName("player1");
+        player2.setName("player2");
+        /*
         if (Config.MY_PLAYER_TYPE == Config.CREATOR_PLAYER_TYPE) {
             player1.setName("Laia");
             player2.setName("Patrick");
@@ -33,7 +36,7 @@ public class MultiPlayerServerSupportImpl {
             player2.setName("Laia");
         }
 
-        /*
+        
         if (Config.MY_PLAYER_TYPE == Config.CREATOR_PLAYER_TYPE) {
             player2.setName("Patrick");
         } else {
