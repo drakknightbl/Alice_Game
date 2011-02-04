@@ -35,7 +35,7 @@ public class HttpRequest {
         */
         public void post(String sUrl, List<NameValuePair>nameValuePairs) {
                 this.htp = new HttpPostThread(sUrl, nameValuePairs);
-                this.htp.run(); // should be start()
+                this.htp.start(); // should be start()
         }
 
         

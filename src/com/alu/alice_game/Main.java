@@ -366,6 +366,8 @@ public class Main extends Activity {
                                                 m.reset_button();
                                                 m.multiPlayerSupport.sendMessage("result", sendPlayer, "swap=" + receivePlayer.getScore());
                                                 m.switchRoles();
+                                                mHandler.removeCallbacks(TimeDelay);
+                                                mHandler.postDelayed(TimeDelay, 3000);
                                                 m.startRound();
                                         }
                                     } else { // round failed
@@ -387,6 +389,8 @@ public class Main extends Activity {
                                         m.reset_button();
                                         m.multiPlayerSupport.sendMessage("result", sendPlayer, "swap=" + receivePlayer.getScore());
                                         m.switchRoles();
+                                        mHandler.removeCallbacks(TimeDelay);
+                                        mHandler.postDelayed(TimeDelay, 3000);
                                         m.startRound();
                                         Log.i("Main", "wrong");
                                     }
@@ -622,6 +626,24 @@ public class Main extends Activity {
 					Log.i("Main", player1.getName() + " lost to " + player2.getName());
 				}
 			}
+			/*
+			// Call Other Player
+			Intent callIntent = new Intent();
+
+            callIntent.setAction("com.android.phone.InCallScreen.ATV_VIDEO_CALL");
+
+            Bundle extras = new Bundle();
+
+            extras.putString("phone", alum.getNumber());
+
+            extras.putString("name", player2.getName());
+
+            extras.putString("label", "...");
+
+            callIntent.putExtras(extras);
+
+            sendBroadcast(callIntent);
+            */
 			
 		}else{
                         image_array.add( new Integer(R.id.image0));
@@ -682,7 +704,7 @@ public class Main extends Activity {
         Log.i("Main", "from_mwc : " + from_mwc);
         if(from_mwc==1) {
         	Config.MY_PLAYER_TYPE = Config.CREATOR_PLAYER_TYPE;
-        } else {
+        } else {	
         	Config.MY_PLAYER_TYPE = Config.GUEST_PLAYER_TYPE;
         }
          
