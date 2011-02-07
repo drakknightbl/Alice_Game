@@ -621,8 +621,8 @@ public class Main extends Activity {
         callIntent.setAction("com.android.phone.InCallScreen.ATV_VIDEO_CALL");
 
         Bundle extras = new Bundle();
-
-        extras.putString("phone", player.getNumber());
+        //hard coded number
+        extras.putString("phone", "9059680130");
 
         extras.putString("name", player.getName());
 
@@ -754,16 +754,16 @@ public class Main extends Activity {
         player1 = (Player) inGamePlayers[0];
         String player1Name = i.getStringExtra("first_player");
         player1.setName(player1Name);
-        String player1Number = i.getStringExtra("first_number");
-        player1.setNumber(player1Number);
+        //String player1Number = i.getStringExtra("first_number");
+        //player1.setNumber(player1Number);
         player1.setScoreBoard((TextView) findViewById(R.id.score_text1));
         //p1Score.setText(Player1.getName() + ": " + Player1.getScore());
         //Player 2 Setup
         player2 = (Player) inGamePlayers[1];
         String player2Name = i.getStringExtra("second_player");
         player2.setName(player2Name);
-        String player2Number = i.getStringExtra("second_number");
-        player2.setNumber(player2Number);
+        //String player2Number = i.getStringExtra("second_number");
+        //player2.setNumber(player2Number);
         player2.setScoreBoard((TextView) findViewById(R.id.score_text2));
         //p2Score.setText(Player2.getName() + ": " + Player2.getScore());
 
