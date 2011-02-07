@@ -366,8 +366,8 @@ public class Main extends Activity {
                                                 m.reset_button();
                                                 m.multiPlayerSupport.sendMessage("result", sendPlayer, "swap=" + receivePlayer.getScore());
                                                 m.switchRoles();
-                                                mHandler.removeCallbacks(TimeDelay);
-                                                mHandler.postDelayed(TimeDelay, 3000);
+                                                //mHandler.removeCallbacks(TimeDelay);
+                                                //mHandler.postDelayed(TimeDelay, 3000);
                                                 m.startRound();
                                         }
                                     } else { // round failed
@@ -378,10 +378,14 @@ public class Main extends Activity {
                                         if(swapped){ 
                                         	numOfRounds-- ;    
                                         	continue_msg ="\nStarting Round " + (4 - numOfRounds);
-                                                swapped = false;
+                                            swapped = false;
                                         } else {
-                                                swapped = true; 
+                                            swapped = true; 
                                         }
+                                        if(numOfRounds == 0){
+                                            continue_msg = "";
+                                        }
+                                        m.random_image_array.clear();
                                         Toast toast = Toast.makeText(getApplicationContext(), "Round Ended" + continue_msg, Toast.LENGTH_SHORT);
                                         toast.setGravity(Gravity.CENTER, 0, -50);
                                         toast.show();
@@ -389,8 +393,8 @@ public class Main extends Activity {
                                         m.reset_button();
                                         m.multiPlayerSupport.sendMessage("result", sendPlayer, "swap=" + receivePlayer.getScore());
                                         m.switchRoles();
-                                        mHandler.removeCallbacks(TimeDelay);
-                                        mHandler.postDelayed(TimeDelay, 3000);
+                                        //mHandler.removeCallbacks(TimeDelay);
+                                        //mHandler.postDelayed(TimeDelay, 3000);
                                         m.startRound();
                                         Log.i("Main", "wrong");
                                     }
@@ -602,6 +606,15 @@ public class Main extends Activity {
 	// The last sender gets to Call the other Player, by firing an intent to trigger ALUM
 	// @param player Player to be called
 	private void callPlayer(Player player){
+		//Stops background music if it is playing.
+    	try{
+	    	if(background_music.isPlaying()){
+	    		background_music.stop();
+	    	}//if
+    	}catch (IllegalStateException e){
+    		
+    	}
+		
 		// Call Other Player
 		Intent callIntent = new Intent();
 
@@ -657,25 +670,25 @@ public class Main extends Activity {
                         image_array.add( new Integer(R.id.image1));
                         image_array.add( new Integer(R.id.image2));
                         if(isSender) {
-                                    button0.setVisibility(View.VISIBLE);
-                                    button1.setVisibility(View.VISIBLE);
-                                    button2.setVisibility(View.VISIBLE);
-                                    if((numOfRounds == 3) && !swapped){
-                                    Toast round = Toast.makeText(getApplicationContext(), "Starting Round 1", Toast.LENGTH_SHORT);
-                                    round.setGravity(Gravity.CENTER, 0, -50);
-                                    round.show();
+                        	button0.setVisibility(View.VISIBLE);
+                            button1.setVisibility(View.VISIBLE);
+                            button2.setVisibility(View.VISIBLE);
+                            if((numOfRounds == 3) && !swapped){
+                            Toast round = Toast.makeText(getApplicationContext(), "Starting Round 1", Toast.LENGTH_SHORT);
+                            round.setGravity(Gravity.CENTER, 0, -50);
+                            round.show();
                             }// if
-                                    Toast greeting_instructions = Toast.makeText(getApplicationContext(), "Set the Order", Toast.LENGTH_SHORT);
+                            Toast greeting_instructions = Toast.makeText(getApplicationContext(), "Set the Order", Toast.LENGTH_SHORT);
                             greeting_instructions.setGravity(Gravity.CENTER, 0, -50);
                             greeting_instructions.show();
 				
-			} else {
-                            if((numOfRounds == 3) && !swapped) {
-                            	
-                                Toast round = Toast.makeText(getApplicationContext(), "Starting Round 1", Toast.LENGTH_SHORT);
-                                round.setGravity(Gravity.CENTER, 0, -50);
-                                round.show();
-                                
+                        } else {
+	                        if((numOfRounds == 3) && !swapped) {
+	                        	
+	                            Toast round = Toast.makeText(getApplicationContext(), "Starting Round 1", Toast.LENGTH_SHORT);
+	                            round.setGravity(Gravity.CENTER, 0, -50);
+	                            round.show();
+	                            
                             }// if
                             this.retrieve_image_array();
                             Log.i("Main", "startRound - isReceiver");
@@ -739,19 +752,19 @@ public class Main extends Activity {
         //UI Items
         //Player 1 Setup
         player1 = (Player) inGamePlayers[0];
-        player1.setScoreBoard((TextView) findViewById(R.id.score_text1));
         String player1Name = i.getStringExtra("first_player");
         player1.setName(player1Name);
         String player1Number = i.getStringExtra("first_number");
         player1.setNumber(player1Number);
+        player1.setScoreBoard((TextView) findViewById(R.id.score_text1));
         //p1Score.setText(Player1.getName() + ": " + Player1.getScore());
         //Player 2 Setup
         player2 = (Player) inGamePlayers[1];
-        player2.setScoreBoard((TextView) findViewById(R.id.score_text2));
         String player2Name = i.getStringExtra("second_player");
         player2.setName(player2Name);
         String player2Number = i.getStringExtra("second_number");
         player2.setNumber(player2Number);
+        player2.setScoreBoard((TextView) findViewById(R.id.score_text2));
         //p2Score.setText(Player2.getName() + ": " + Player2.getScore());
 
         
