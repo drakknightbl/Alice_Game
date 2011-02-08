@@ -25,7 +25,7 @@ import com.alu.alice_game.Main;
 public class HttpRequest {
     	HttpPostThread htp;
     	HttpGetThread htg;
-
+        Boolean finished = false;
         /**
         * Post request (upload files)
         * @param sUrl
@@ -90,6 +90,7 @@ public class HttpRequest {
                 this.sUrl = sUrl;
                 this.ctx = ctx;
                 this.mHandler = new Handler();
+
             }
 
             private Runnable pollAgain = new Runnable() {
@@ -101,6 +102,8 @@ public class HttpRequest {
             public void onFinish() {
             	Log.i("HttpRequest", "onFinish");
             	this.mHandler.removeCallbacks(pollAgain);
+                HttpRequest.this.finished = true;
+                HttpRequest.this.get(this.sUrl, this.ctx);
             }
 
             public void run() {
@@ -115,8 +118,10 @@ public class HttpRequest {
                     if(he != null) {
                         String message = EntityUtils.toString(he);
                         if(message.equals("")) { // poll
-                            this.mHandler.removeCallbacks(pollAgain);
-                            this.mHandler.postDelayed(pollAgain, 5000);
+                            if(HttpRequest.this.finished==false) {
+                                this.mHandler.removeCallbacks(pollAgain);
+                                this.mHandler.postDelayed(pollAgain, 5000);
+                            }
                         } else { 
                             Main m = (Main) this.ctx;
                             m.messageReceived(message);
