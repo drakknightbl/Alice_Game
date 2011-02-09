@@ -661,7 +661,7 @@ public class Main extends Activity {
 			}
 			// Make Call
 			if(isSender){
-				this.callPlayer(player2);
+				//this.callPlayer(player2);
 			}
             
 			
